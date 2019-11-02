@@ -109,7 +109,7 @@ impl Client {
 
     pub(crate) fn fetch<T: DeserializeOwned>(&self, path: String) -> Result<T> {
         let request_url = format!("{}{}", self.base_url, path);
-        let mut response = self.client.get(&request_url).send()?;
+        let mut response = self.client.get(&request_url).send()?.error_for_status()?;
         let result: Data<T> = response.json()?;
         Ok(result.data)
     }
@@ -128,5 +128,4 @@ impl Client {
     pub fn get_hotspot(&self, address: &str) -> Result<Hotspot> {
         self.fetch::<Hotspot>(format!("/hotspots/{}", address))
     }
-
 }
