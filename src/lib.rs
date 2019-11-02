@@ -5,8 +5,12 @@ use reqwest;
 use serde::de::DeserializeOwned;
 use std::time::Duration;
 
-const DEFAULT_TIMEOUT: u64 = 120;
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+/// The default timeout for API requests
+pub const DEFAULT_TIMEOUT: u64 = 120;
+/// The default base URL if none is specified.
+pub const DEFAULT_BASE_URL: &'static str = "https://explorer.helium.foundation/api";
+
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Clone, Deserialize, Debug)]
 /// Represents a wallet on the blockchain.
@@ -81,7 +85,7 @@ impl Client {
     /// Create a new client using the hosted Helium API at
     /// explorer.helium.foundation
     pub fn new() -> Self {
-        Self::new_with_base_url("https://explorer.helium.foundation/api")
+        Self::new_with_base_url(DEFAULT_BASE_URL)
     }
 
     /// Create a new client using a given base URL and a default
