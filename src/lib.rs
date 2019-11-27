@@ -1,16 +1,20 @@
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate serde_json;
 
+use helium_proto::txn::{txn, Txn};
+use helium_proto::Message;
 use reqwest;
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
 
 /// The default timeout for API requests
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
-pub const DEFAULT_BASE_URL: &'static str = "https://explorer.helium.foundation/api";
+pub const DEFAULT_BASE_URL: &'static str = "https://alamo.helium.foundation/api";
 
-pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Clone, Deserialize, Debug)]
 /// Represents a wallet on the blockchain.
@@ -24,6 +28,8 @@ pub struct Account {
     pub dc_balance: u64,
     /// The security token balance of the wallet known to the API
     pub security_balance: u64,
+    /// The current nonce for the account
+    pub nonce: u64
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -80,7 +86,6 @@ pub struct Client {
     client: reqwest::Client,
 }
 
-
 impl Client {
     /// Create a new client using the hosted Helium API at
     /// explorer.helium.foundation
@@ -114,6 +119,15 @@ impl Client {
         Ok(result.data)
     }
 
+    pub(crate) fn post<T: Serialize + ?Sized>(&self, path: String, json: &T) -> Result {
+        let request_url = format!("{}{}", self.base_url, path);
+        let response = self.client.post(&request_url).json(json).send()?;
+        match response.error_for_status() {
+            Ok(_) => Ok(()),
+            Err(err) => Err(Box::new(err)),
+        }
+    }
+
     /// Get wallet information for a given address
     pub fn get_account(&self, address: &str) -> Result<Account> {
         self.fetch::<Account>(format!("/accounts/{}", address))
@@ -127,5 +141,16 @@ impl Client {
     /// Get details for a given hotspot address
     pub fn get_hotspot(&self, address: &str) -> Result<Hotspot> {
         self.fetch::<Hotspot>(format!("/hotspots/{}", address))
+    }
+
+    /// Submit a transaction to the blockchain
+    pub fn submit_txn(&self, txn: txn::Txn) -> Result {
+        let wrapper = Txn { txn: Some(txn) };
+        let mut buf = vec![];
+        wrapper.encode(&mut buf)?;
+        self.post(
+            "/transactions".to_string(),
+            &json!({ "txn": base64::encode(&buf) }),
+        )
     }
 }
