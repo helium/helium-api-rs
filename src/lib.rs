@@ -12,7 +12,7 @@ use std::time::Duration;
 /// The default timeout for API requests
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
-pub const DEFAULT_BASE_URL: &'static str = "https://alamo.helium.foundation/api";
+pub const DEFAULT_BASE_URL: &'static str = "https://explorer.helium.foundation/api";
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
