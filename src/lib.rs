@@ -3,7 +3,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
-use helium_proto::blockchain::{BlockchainTxn, Txn};
+use helium_proto::{BlockchainTxn, Txn};
 use helium_proto::Message;
 use reqwest;
 use serde::{de::DeserializeOwned, Serialize};
