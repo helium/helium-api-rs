@@ -3,7 +3,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
-use helium_proto::txn::{txn, Txn};
+use helium_proto::blockchain::{BlockchainTxn, Txn};
 use helium_proto::Message;
 use reqwest;
 use serde::{de::DeserializeOwned, Serialize};
@@ -146,8 +146,8 @@ impl Client {
     }
 
     /// Submit a transaction to the blockchain
-    pub fn submit_txn(&self, txn: txn::Txn) -> Result {
-        let wrapper = Txn { txn: Some(txn) };
+    pub fn submit_txn(&self, txn: Txn) -> Result {
+        let wrapper = BlockchainTxn { txn: Some(txn) };
         let mut buf = vec![];
         wrapper.encode(&mut buf)?;
         self.post(
