@@ -12,7 +12,7 @@ use std::time::Duration;
 /// The default timeout for API requests
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
-pub const DEFAULT_BASE_URL: &'static str = "https://explorer.helium.foundation/api";
+pub const DEFAULT_BASE_URL: &str = "https://explorer.helium.foundation/api";
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -29,7 +29,7 @@ pub struct Account {
     /// The security token balance of the wallet known to the API
     pub security_balance: u64,
     /// The current nonce for the account
-    pub nonce: u64
+    pub nonce: u64,
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -86,13 +86,15 @@ pub struct Client {
     client: reqwest::Client,
 }
 
-impl Client {
+impl Default for Client {
     /// Create a new client using the hosted Helium API at
     /// explorer.helium.foundation
-    pub fn new() -> Self {
+    fn default() -> Self {
         Self::new_with_base_url(DEFAULT_BASE_URL)
     }
+}
 
+impl Client {
     /// Create a new client using a given base URL and a default
     /// timeout. The library will use absoluate paths based on this
     /// base_url.

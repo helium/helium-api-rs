@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.com/helium/helium-api-rs.svg?branch=master)](https://travis-ci.com/helium/helium-api-rs)
