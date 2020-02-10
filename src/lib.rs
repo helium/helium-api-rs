@@ -29,7 +29,7 @@ pub struct Account {
     /// The security token balance of the wallet known to the API
     pub security_balance: u64,
     /// The current nonce for the account
-    pub nonce: u64
+    pub nonce: u64,
 }
 
 #[derive(Clone, Deserialize, Debug)]
