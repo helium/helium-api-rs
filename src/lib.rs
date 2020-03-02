@@ -3,6 +3,9 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
+mod hnt;
+pub use hnt::Hnt;
+
 use helium_proto::{BlockchainTxn, Message, Txn};
 use reqwest;
 use serde::{de::DeserializeOwned, Serialize};
@@ -11,7 +14,7 @@ use std::time::Duration;
 /// The default timeout for API requests
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
-pub const DEFAULT_BASE_URL: &str = "https://api.helium.com/v1";
+pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -29,28 +32,12 @@ pub struct Account {
     pub sec_balance: u64,
     /// The current nonce for the account
     pub nonce: u64,
+    /// The speculative nonce for the account
+    pub speculative_nonce: u64,
 }
 
 #[derive(Clone, Deserialize, Debug)]
-pub struct Hotspot {
-    #[serde(alias = "gateway", alias = "address")]
-    /// The address of the hotspots. This is the public key in base58
-    /// check-encoding of the hotspot.
-    pub address: String,
-    /// The hotspot owner wallet address
-    pub owner: String,
-    /// The "animal" name of the hotspot. The name can be `None` for
-    /// some API endpoints.
-    pub name: Option<String>,
-    /// The block height when the hotspot was added to the blockchain
-    pub added_height: Option<u64>,
-    /// The last asserted latitude of the hotspot
-    pub lat: f64,
-    /// The last asserted longitude of the hotspot
-    pub lng: f64,
-    /// The h3 index based on the lat/lon of the hotspot is used for
-    /// PoC challenges.
-    pub location: String, // h3
+pub struct Geocode {
     /// The long version of city for the last asserted location
     pub long_city: Option<String>,
     /// The long version of country for the last asserted location
@@ -67,11 +54,39 @@ pub struct Hotspot {
     pub short_state: Option<String>,
     /// The short version of street for the last asserted location
     pub short_street: Option<String>,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct Hotspot {
+    /// The address of the hotspots. This is the public key in base58
+    /// check-encoding of the hotspot.
+    pub address: String,
+    /// The hotspot owner wallet address
+    pub owner: String,
+    /// The "animal" name of the hotspot. The name can be `None` for
+    /// some API endpoints.
+    pub name: Option<String>,
+    /// The block height when the hotspot was added to the blockchain
+    pub added_height: Option<u64>,
+    /// The last asserted latitude of the hotspot
+    pub lat: Option<f64>,
+    /// The last asserted longitude of the hotspot
+    pub lng: Option<f64>,
+    /// The h3 index based on the lat/lon of the hotspot is used for
+    /// PoC challenges.
+    pub location: Option<String>, // h3
+    /// The geocode information for the hotspot loocation
+    pub geocode: Geocode,
     /// The current known score of the hotspos
     pub score: f32,
     /// The last block the score for the hotspot was updated. None if
     /// the score was never updated.
     pub score_update_height: Option<u64>,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct PendingTxnStatus {
+    pub hash: String,
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -120,13 +135,20 @@ impl Client {
         Ok(result.data)
     }
 
-    pub(crate) fn post<T: Serialize + ?Sized>(&self, path: String, json: &T) -> Result {
+    pub(crate) fn post<T: Serialize + ?Sized, R: DeserializeOwned>(
+        &self,
+        path: String,
+        json: &T,
+    ) -> Result<R> {
         let request_url = format!("{}{}", self.base_url, path);
-        let response = self.client.post(&request_url).json(json).send()?;
-        match response.error_for_status() {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Box::new(err)),
-        }
+        let mut response = self
+            .client
+            .post(&request_url)
+            .json(json)
+            .send()?
+            .error_for_status()?;
+        let result: Data<R> = response.json()?;
+        Ok(result.data)
     }
 
     /// Get wallet information for a given address
@@ -144,14 +166,17 @@ impl Client {
         self.fetch::<Hotspot>(format!("/hotspots/{}", address))
     }
 
+    /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
-    pub fn submit_txn(&self, txn: Txn) -> Result {
+    pub fn submit_txn(&self, txn: Txn) -> Result<PendingTxnStatus> {
+        let json = Client::txn_to_json(txn)?;
+        self.post("/pending_transactions".to_string(), &json)
+    }
+
+    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
         let wrapper = BlockchainTxn { txn: Some(txn) };
         let mut buf = vec![];
         wrapper.encode(&mut buf)?;
-        self.post(
-            "/transactions".to_string(),
-            &json!({ "txn": base64::encode(&buf) }),
-        )
+        Ok(json!({ "txn": base64::encode(&buf) }))
     }
 }
