@@ -3,6 +3,9 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
+mod hnt;
+pub use hnt::Hnt;
+
 use helium_proto::{BlockchainTxn, Message, Txn};
 use reqwest;
 use serde::{de::DeserializeOwned, Serialize};
@@ -11,7 +14,7 @@ use std::time::Duration;
 /// The default timeout for API requests
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
-pub const DEFAULT_BASE_URL: &str = "https://explorer.helium.foundation/api";
+pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -26,14 +29,35 @@ pub struct Account {
     /// The data credit balance of the wallet known to the API
     pub dc_balance: u64,
     /// The security token balance of the wallet known to the API
-    pub security_balance: u64,
+    pub sec_balance: u64,
     /// The current nonce for the account
     pub nonce: u64,
+    /// The speculative nonce for the account
+    pub speculative_nonce: u64,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct Geocode {
+    /// The long version of city for the last asserted location
+    pub long_city: Option<String>,
+    /// The long version of country for the last asserted location
+    pub long_country: Option<String>,
+    /// The long version of state for the last asserted location
+    pub long_state: Option<String>,
+    /// The long version of street for the last asserted location
+    pub long_street: Option<String>,
+    /// The short version of city for the last asserted location
+    pub short_city: Option<String>,
+    /// The short version of country for the last asserted location
+    pub short_country: Option<String>,
+    /// The short version of state for the last asserted location
+    pub short_state: Option<String>,
+    /// The short version of street for the last asserted location
+    pub short_street: Option<String>,
 }
 
 #[derive(Clone, Deserialize, Debug)]
 pub struct Hotspot {
-    #[serde(alias = "gateway", alias = "address")]
     /// The address of the hotspots. This is the public key in base58
     /// check-encoding of the hotspot.
     pub address: String,
@@ -45,33 +69,24 @@ pub struct Hotspot {
     /// The block height when the hotspot was added to the blockchain
     pub added_height: Option<u64>,
     /// The last asserted latitude of the hotspot
-    pub lat: f64,
+    pub lat: Option<f64>,
     /// The last asserted longitude of the hotspot
-    pub lng: f64,
+    pub lng: Option<f64>,
     /// The h3 index based on the lat/lon of the hotspot is used for
     /// PoC challenges.
-    pub location: String, // h3
-    /// The long version of city for the last asserted location
-    pub long_city: String,
-    /// The long version of country for the last asserted location
-    pub long_country: String,
-    /// The long version of state for the last asserted location
-    pub long_state: String,
-    /// The long version of street for the last asserted location
-    pub long_street: String,
-    /// The short version of city for the last asserted location
-    pub short_city: String,
-    /// The short version of country for the last asserted location
-    pub short_country: String,
-    /// The short version of state for the last asserted location
-    pub short_state: String,
-    /// The short version of street for the last asserted location
-    pub short_street: String,
+    pub location: Option<String>, // h3
+    /// The geocode information for the hotspot loocation
+    pub geocode: Geocode,
     /// The current known score of the hotspos
     pub score: f32,
     /// The last block the score for the hotspot was updated. None if
     /// the score was never updated.
     pub score_update_height: Option<u64>,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct PendingTxnStatus {
+    pub hash: String,
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -81,7 +96,7 @@ pub(crate) struct Data<T> {
 
 #[derive(Clone, Debug)]
 pub struct Client {
-    base_url: &'static str,
+    base_url: String,
     client: reqwest::Client,
 }
 
@@ -89,7 +104,7 @@ impl Default for Client {
     /// Create a new client using the hosted Helium API at
     /// explorer.helium.foundation
     fn default() -> Self {
-        Self::new_with_base_url(DEFAULT_BASE_URL)
+        Self::new_with_base_url(DEFAULT_BASE_URL.to_string())
     }
 }
 
@@ -97,14 +112,14 @@ impl Client {
     /// Create a new client using a given base URL and a default
     /// timeout. The library will use absoluate paths based on this
     /// base_url.
-    pub fn new_with_base_url(base_url: &'static str) -> Self {
+    pub fn new_with_base_url(base_url: String) -> Self {
         Self::new_with_timeout(base_url, DEFAULT_TIMEOUT)
     }
 
     /// Create a new client using a given base URL, and request
     /// timeout value.  The library will use absoluate paths based on
     /// the given base_url.
-    pub fn new_with_timeout(base_url: &'static str, timeout: u64) -> Self {
+    pub fn new_with_timeout(base_url: String, timeout: u64) -> Self {
         let client = reqwest::Client::builder()
             .gzip(true)
             .timeout(Duration::from_secs(timeout))
@@ -120,13 +135,20 @@ impl Client {
         Ok(result.data)
     }
 
-    pub(crate) fn post<T: Serialize + ?Sized>(&self, path: String, json: &T) -> Result {
+    pub(crate) fn post<T: Serialize + ?Sized, R: DeserializeOwned>(
+        &self,
+        path: String,
+        json: &T,
+    ) -> Result<R> {
         let request_url = format!("{}{}", self.base_url, path);
-        let response = self.client.post(&request_url).json(json).send()?;
-        match response.error_for_status() {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Box::new(err)),
-        }
+        let mut response = self
+            .client
+            .post(&request_url)
+            .json(json)
+            .send()?
+            .error_for_status()?;
+        let result: Data<R> = response.json()?;
+        Ok(result.data)
     }
 
     /// Get wallet information for a given address
@@ -136,7 +158,7 @@ impl Client {
 
     /// Get hotspots for a given wallet address
     pub fn get_hotspots(&self, address: &str) -> Result<Vec<Hotspot>> {
-        self.fetch::<Vec<Hotspot>>(format!("/accounts/{}/gateways", address))
+        self.fetch::<Vec<Hotspot>>(format!("/accounts/{}/hotspots", address))
     }
 
     /// Get details for a given hotspot address
@@ -144,14 +166,17 @@ impl Client {
         self.fetch::<Hotspot>(format!("/hotspots/{}", address))
     }
 
+    /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
-    pub fn submit_txn(&self, txn: Txn) -> Result {
+    pub fn submit_txn(&self, txn: Txn) -> Result<PendingTxnStatus> {
+        let json = Client::txn_to_json(txn)?;
+        self.post("/pending_transactions".to_string(), &json)
+    }
+
+    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
         let wrapper = BlockchainTxn { txn: Some(txn) };
         let mut buf = vec![];
         wrapper.encode(&mut buf)?;
-        self.post(
-            "/transactions".to_string(),
-            &json!({ "txn": base64::encode(&buf) }),
-        )
+        Ok(json!({ "txn": base64::encode(&buf) }))
     }
 }

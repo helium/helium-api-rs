@@ -1,6 +1,6 @@
 [package]
 name = "helium-api"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Marc Nijdam <marc@helium.com>"]
 edition = "2018"
 
@@ -12,4 +12,5 @@ serde =  "1"
 serde_derive = "1"
 serde_json = "1"
 base64 = "0"
+rust_decimal = "1"
 helium-proto = { git = "https://github.com/helium/proto" }
