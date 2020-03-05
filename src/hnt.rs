@@ -16,7 +16,7 @@ impl FromStr for Hnt {
             .unwrap();
 
         if data.scale() > 8 {
-            Err(format!("Invalid conversion from string {}", s).into())
+            Err(format!("Too many decimals in input {}. Only 8 decimals permitted", s).into())
         } else {
             Ok(Hnt(data))
         }
