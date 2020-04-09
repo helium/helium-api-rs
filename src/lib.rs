@@ -7,7 +7,6 @@ mod hnt;
 pub use hnt::Hnt;
 
 use helium_proto::{BlockchainTxn, Message, Txn};
-use reqwest;
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
 
