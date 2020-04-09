@@ -7,7 +7,6 @@ mod hnt;
 pub use hnt::Hnt;
 
 use helium_proto::{BlockchainTxn, Message, Txn};
-use reqwest;
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
 
@@ -33,6 +32,7 @@ pub struct Account {
     /// The current nonce for the account
     pub nonce: u64,
     /// The speculative nonce for the account
+    #[serde(default)]
     pub speculative_nonce: u64,
 }
 
