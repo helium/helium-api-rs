@@ -57,6 +57,12 @@ pub struct Geocode {
 }
 
 #[derive(Clone, Deserialize, Debug)]
+pub struct Height {
+    /// The current block height of the chain.
+    pub height: u64,
+}
+
+#[derive(Clone, Deserialize, Debug)]
 pub struct Hotspot {
     /// The address of the hotspots. This is the public key in base58
     /// check-encoding of the hotspot.
@@ -154,6 +160,12 @@ impl Client {
     /// Get wallet information for a given address
     pub fn get_account(&self, address: &str) -> Result<Account> {
         self.fetch::<Account>(format!("/accounts/{}", address))
+    }
+
+    /// Get the current block height
+    pub fn get_height(&self) -> Result<u64> {
+        let result = self.fetch::<Height>("/blocks/height".to_string())?;
+        Ok(result.height)
     }
 
     /// Get hotspots for a given wallet address
