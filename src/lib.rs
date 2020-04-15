@@ -185,10 +185,14 @@ impl Client {
         self.post("/pending_transactions".to_string(), &json)
     }
 
-    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
+    pub fn txn_to_b64(txn: Txn) -> Result<String> {
         let wrapper = BlockchainTxn { txn: Some(txn) };
         let mut buf = vec![];
         wrapper.encode(&mut buf)?;
-        Ok(json!({ "txn": base64::encode(&buf) }))
+        Ok(base64::encode(&buf))
+    }
+
+    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
+        Ok(json!({ "txn": Self::txn_to_b64(txn)?}))
     }
 }
