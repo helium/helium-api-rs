@@ -185,10 +185,19 @@ impl Client {
         self.post("/pending_transactions".to_string(), &json)
     }
 
-    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
+    /// Convert a given transaction to it's b64 encoded binary
+    /// form. The encoded transaction is ready for submission to the
+    /// api
+    pub fn txn_to_b64(txn: Txn) -> Result<String> {
         let wrapper = BlockchainTxn { txn: Some(txn) };
         let mut buf = vec![];
         wrapper.encode(&mut buf)?;
-        Ok(json!({ "txn": base64::encode(&buf) }))
+        Ok(base64::encode(&buf))
+    }
+
+    /// Convert the given transaction to the json that is required to
+    /// be submitted to the api endpoint
+    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
+        Ok(json!({ "txn": Self::txn_to_b64(txn)?}))
     }
 }
