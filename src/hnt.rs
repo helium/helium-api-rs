@@ -2,7 +2,7 @@ use rust_decimal::prelude::*;
 use rust_decimal::Decimal;
 use std::str::FromStr;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct Hnt(Decimal);
 
 const HNT_TO_BONES_SCALAR: i32 = 100_000_000;
