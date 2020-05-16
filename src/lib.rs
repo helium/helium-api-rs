@@ -6,7 +6,7 @@ extern crate serde_json;
 mod hnt;
 pub use hnt::Hnt;
 
-use helium_proto::{BlockchainTxn, Message, Txn};
+use helium_proto::{BlockchainTxn, Message};
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
 
@@ -180,7 +180,7 @@ impl Client {
 
     /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
-    pub fn submit_txn(&self, txn: Txn) -> Result<PendingTxnStatus> {
+    pub fn submit_txn(&self, txn: &BlockchainTxn) -> Result<PendingTxnStatus> {
         let json = Client::txn_to_json(txn)?;
         self.post("/pending_transactions".to_string(), &json)
     }
@@ -188,16 +188,15 @@ impl Client {
     /// Convert a given transaction to it's b64 encoded binary
     /// form. The encoded transaction is ready for submission to the
     /// api
-    pub fn txn_to_b64(txn: Txn) -> Result<String> {
-        let wrapper = BlockchainTxn { txn: Some(txn) };
+    pub fn txn_to_b64(txn: &BlockchainTxn) -> Result<String> {
         let mut buf = vec![];
-        wrapper.encode(&mut buf)?;
+        txn.encode(&mut buf)?;
         Ok(base64::encode(&buf))
     }
 
     /// Convert the given transaction to the json that is required to
     /// be submitted to the api endpoint
-    pub fn txn_to_json(txn: Txn) -> Result<serde_json::Value> {
+    pub fn txn_to_json(txn: &BlockchainTxn) -> Result<serde_json::Value> {
         Ok(json!({ "txn": Self::txn_to_b64(txn)?}))
     }
 }
