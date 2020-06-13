@@ -17,7 +17,7 @@ pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents a wallet on the blockchain.
 pub struct Account {
     /// The wallet address is the base58 check-encoded public key of
@@ -34,6 +34,9 @@ pub struct Account {
     /// The speculative nonce for the account
     #[serde(default)]
     pub speculative_nonce: u64,
+    /// The speculative security nonce for the account
+    #[serde(default)]
+    pub speculative_sec_nonce: u64,
 }
 
 #[derive(Clone, Deserialize, Debug)]
