@@ -137,7 +137,7 @@ impl Client {
         Self { base_url, client }
     }
 
-    pub(crate) fn fetch<T: DeserializeOwned>(&self, path: String) -> Result<T> {
+    pub(crate) fn fetch<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
         let request_url = format!("{}{}", self.base_url, path);
         let mut response = self.client.get(&request_url).send()?.error_for_status()?;
         let result: Data<T> = response.json()?;
@@ -146,7 +146,7 @@ impl Client {
 
     pub(crate) fn post<T: Serialize + ?Sized, R: DeserializeOwned>(
         &self,
-        path: String,
+        path: &str,
         json: &T,
     ) -> Result<R> {
         let request_url = format!("{}{}", self.base_url, path);
@@ -162,30 +162,39 @@ impl Client {
 
     /// Get wallet information for a given address
     pub fn get_account(&self, address: &str) -> Result<Account> {
-        self.fetch::<Account>(format!("/accounts/{}", address))
+        self.fetch::<Account>(&format!("/accounts/{}", address))
     }
 
     /// Get the current block height
     pub fn get_height(&self) -> Result<u64> {
-        let result = self.fetch::<Height>("/blocks/height".to_string())?;
+        let result = self.fetch::<Height>("/blocks/height")?;
         Ok(result.height)
     }
 
     /// Get hotspots for a given wallet address
     pub fn get_hotspots(&self, address: &str) -> Result<Vec<Hotspot>> {
-        self.fetch::<Vec<Hotspot>>(format!("/accounts/{}/hotspots", address))
+        self.fetch::<Vec<Hotspot>>(&format!("/accounts/{}/hotspots", address))
     }
 
     /// Get details for a given hotspot address
     pub fn get_hotspot(&self, address: &str) -> Result<Hotspot> {
-        self.fetch::<Hotspot>(format!("/hotspots/{}", address))
+        self.fetch::<Hotspot>(&format!("/hotspots/{}", address))
+    }
+
+    /// Get the current active set of chain variables
+    pub fn get_vars(&self) -> Result<serde_json::Map<String, serde_json::Value>> {
+        let result = self.fetch::<serde_json::Value>("/vars")?;
+        match result.as_object() {
+            Some(map) => Ok(map.clone()),
+            None => Err("Expected a chain variable map".into()),
+        }
     }
 
     /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
     pub fn submit_txn(&self, txn: &BlockchainTxn) -> Result<PendingTxnStatus> {
         let json = Client::txn_to_json(txn)?;
-        self.post("/pending_transactions".to_string(), &json)
+        self.post("/pending_transactions", &json)
     }
 
     /// Convert a given transaction to it's b64 encoded binary
