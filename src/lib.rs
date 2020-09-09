@@ -190,6 +190,15 @@ impl Client {
         }
     }
 
+    /// Get the last assigned OUI value
+    pub fn get_last_oui(&self) -> Result<u64> {
+        let result = self.fetch::<serde_json::Value>("/ouis/last")?;
+        match result["oui"].as_u64() {
+            Some(oui) => Ok(oui),
+            None => Err("Expected an oui field".into()),
+        }
+    }
+
     /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
     pub fn submit_txn(&self, txn: &BlockchainTxn) -> Result<PendingTxnStatus> {
