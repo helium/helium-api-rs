@@ -11,6 +11,7 @@ reqwest = "~0.9"
 serde =  "1"
 serde_derive = "1"
 serde_json = "1"
-base64 = "0"
+base64 = "0.12"
 rust_decimal = {version = "1", features = ["serde-float"] }
 helium-proto = { git = "https://github.com/helium/proto", branch="master"}
+bs58 = {version = "0.3.0", features=["check"]}

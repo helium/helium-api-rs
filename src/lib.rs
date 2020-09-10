@@ -6,6 +6,9 @@ extern crate serde_json;
 mod hnt;
 pub use hnt::Hnt;
 
+pub mod transactions;
+pub use transactions::Transaction;
+
 pub use helium_proto::*;
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
@@ -140,6 +143,7 @@ impl Client {
     pub(crate) fn fetch<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
         let request_url = format!("{}{}", self.base_url, path);
         let mut response = self.client.get(&request_url).send()?.error_for_status()?;
+
         let result: Data<T> = response.json()?;
         Ok(result.data)
     }
