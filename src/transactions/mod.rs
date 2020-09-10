@@ -33,6 +33,7 @@ pub enum Transaction {
     PaymentV2(PaymentV2),
     PriceOracleV1(PriceOracleV1),
     GenPriceOracleV1(GenPriceOracleV1),
+    BundleV1(BundleV1),
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -50,7 +51,7 @@ pub struct SecurityCoinbaseV1 {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct OuiV1 {
     pub owner: Pubkey,
-    pub addresses: Pubkey,
+    pub addresses: Vec<Pubkey>,
     pub filter: DataField,
     pub requested_subnet_size: u32,
     pub payer: Pubkey,
@@ -87,15 +88,16 @@ pub struct TxnRoutingV1 {
     pub fee: u64,
     pub nonce: u64,
     pub signature: Option<Signature>,
-    pub staking_fee: u64,
+    pub staking_fee: Option<u64>,
     pub update: ::std::option::Option<blockchain_txn_routing_v1::Update>,
 }
 
 pub mod blockchain_txn_routing_v1 {
+    use super::DataField;
     #[derive(Deserialize, Serialize, Debug, Clone)]
     pub enum Update {
         UpdateRouters(super::UpdateRouters),
-        NewXor(std::vec::Vec<u8>),
+        NewXor(DataField),
         UpdateXor(super::UpdateXor),
         RequestSubnet(u32),
     }
@@ -103,8 +105,11 @@ pub mod blockchain_txn_routing_v1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct PaymentV1 {
-    pub payer: std::vec::Vec<u8>,
-    pub payee: std::vec::Vec<u8>,
+    pub time: usize,
+    pub height: u64,
+    pub hash: String,
+    pub payer: Pubkey,
+    pub payee: Pubkey,
     pub amount: u64,
     pub fee: u64,
     pub nonce: u64,
@@ -113,6 +118,9 @@ pub struct PaymentV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SecurityExchangeV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: String,
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
@@ -136,10 +144,10 @@ pub struct AddGatewayV1 {
     pub hash: String,
     pub owner: Pubkey,
     pub gateway: Pubkey,
-    pub owner_signature: Option<std::vec::Vec<u8>>,
-    pub gateway_signature: Option<std::vec::Vec<u8>>,
+    pub owner_signature: Option<Signature>,
+    pub gateway_signature: Option<Signature>,
     pub payer: Pubkey,
-    pub payer_signature: Pubkey,
+    pub payer_signature: Signature,
     pub staking_fee: u64,
     pub fee: u64,
 }
@@ -155,7 +163,7 @@ pub struct AssertLocationV1 {
     pub gateway_signature: Option<Signature>,
     pub owner_signature: Option<Signature>,
     pub payer_signature: Option<Signature>,
-    pub location: DataField,
+    pub location: String,
     pub nonce: u64,
     pub staking_fee: u64,
     pub fee: u64,
@@ -205,6 +213,9 @@ pub struct PocRequestV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct BlockchainPocReceiptV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: String,
     pub gateway: Pubkey,
     pub timestamp: u64,
     pub signal: i32,
@@ -217,6 +228,9 @@ pub struct BlockchainPocReceiptV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct BlockchainPocWitnessV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: String,
     pub gateway: Pubkey,
     pub timestamp: u64,
     pub signal: i32,
@@ -316,14 +330,14 @@ pub struct RewardV1 {
 pub struct TokenBurnV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
-    pub nonce: u64,
-    pub signature: Option<Signature>,
-    pub fee: u64,
-    pub memo: u64,
+    // pub nonce: u64,
+    // pub signature: Option<Signature>,
+    // pub fee: Option<u64>,
+    // pub memo: Memo,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -399,14 +413,23 @@ pub struct StateChannelSummary {
 pub struct StateChannelV1 {
     pub id: DataField,
     pub owner: Pubkey,
-    pub credits: u64,
+//    pub credits: u64,
     pub nonce: u64,
     pub summaries: ::std::vec::Vec<StateChannelSummary>,
-    pub root_hash: DataField,
-    pub skewed: DataField,
-    pub state: i32,
+    pub root_hash: String,
+//    pub skewed: DataField,
+    pub state: state_channel_v1::State,
     pub expire_at_block: u64,
     pub signature: Option<Signature>,
+}
+
+pub mod state_channel_v1 {
+    #[derive(Deserialize, Serialize, Debug, Clone)]
+    #[serde(rename_all = "snake_case")]
+    pub enum State {
+        Open,
+        Closed
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -417,7 +440,7 @@ pub struct StateChannelCloseV1 {
     pub state_channel: ::std::option::Option<StateChannelV1>,
     pub closer: Pubkey,
     pub signature: Option<Signature>,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub conflicts_with: ::std::option::Option<StateChannelV1>,
 }
 
@@ -456,7 +479,7 @@ pub struct GenPriceOracleV1 {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct BlockchainTxnBundleV1 {
+pub struct BundleV1 {
     pub transactions: ::std::vec::Vec<BlockchainTxn>,
 }
 

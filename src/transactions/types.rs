@@ -3,9 +3,15 @@ use std::fmt;
 
 use super::custom_serde;
 
-#[derive(Clone, Default)]
+#[derive(PartialEq, Clone, Default)]
 pub struct Signature {
     data: std::vec::Vec<u8>
+}
+
+impl Signature {
+    pub fn to_string(&self) -> String {
+        custom_serde::base64_url::to_string(self.data.as_slice())
+    }
 }
 
 impl Serialize for Signature {
@@ -13,7 +19,7 @@ impl Serialize for Signature {
         where
             S: Serializer,
     {
-        custom_serde::base64::serialize(self.data.as_slice(), serializer)
+        custom_serde::base64_url::serialize(self.data.as_slice(), serializer)
     }
 }
 
@@ -23,20 +29,32 @@ impl<'de> Deserialize<'de> for Signature {
             D: Deserializer<'de>,
     {
         Ok(Signature{
-            data: custom_serde::base64::deserialize(deserializer)?
+            data: custom_serde::base64_url::deserialize(deserializer)?
         })
     }
 }
 
 impl fmt::Debug for Signature {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&custom_serde::base64::to_string(self.data.as_slice()))
+        f.write_str(&custom_serde::base64_url::to_string(self.data.as_slice()))
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(PartialEq, Clone, Default)]
 pub struct Pubkey {
     data: std::vec::Vec<u8>
+}
+
+impl Pubkey {
+    pub fn to_string(&self) -> String {
+        custom_serde::base58::to_string(self.data.as_slice())
+    }
+}
+
+impl PartialEq<&str> for Pubkey {
+    fn eq(&self, other: &&str) -> bool {
+        custom_serde::base64_url::to_string(self.data.as_slice()).as_str() == *other
+    }
 }
 
 impl Serialize for Pubkey {
@@ -65,9 +83,21 @@ impl fmt::Debug for Pubkey {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(PartialEq, Clone, Default)]
 pub struct Hash {
     data: std::vec::Vec<u8>
+}
+
+impl Hash {
+    pub fn to_string(&self) -> String {
+        custom_serde::base64_url::to_string(self.data.as_slice())
+    }
+}
+
+impl PartialEq<&str> for Hash {
+    fn eq(&self, other: &&str) -> bool {
+        custom_serde::base64_url::to_string(self.data.as_slice()).as_str() == *other
+    }
 }
 
 impl Serialize for Hash {
@@ -75,7 +105,7 @@ impl Serialize for Hash {
         where
             S: Serializer,
     {
-        custom_serde::base64::serialize(self.data.as_slice(), serializer)
+        custom_serde::base64_url::serialize(self.data.as_slice(), serializer)
     }
 }
 
@@ -85,18 +115,18 @@ impl<'de> Deserialize<'de> for Hash {
             D: Deserializer<'de>,
     {
         Ok(Hash{
-            data: custom_serde::base64::deserialize(deserializer)?
+            data: custom_serde::base64_url::deserialize(deserializer)?
         })
     }
 }
 
 impl fmt::Debug for Hash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&custom_serde::base64::to_string(self.data.as_slice()))
+        f.write_str(&custom_serde::base64_url::to_string(self.data.as_slice()))
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(PartialEq, Clone, Default)]
 pub struct DataField {
     data: std::vec::Vec<u8>
 }
@@ -106,7 +136,7 @@ impl Serialize for DataField {
         where
             S: Serializer,
     {
-        custom_serde::base64::serialize(self.data.as_slice(), serializer)
+        custom_serde::base64_url::serialize(self.data.as_slice(), serializer)
     }
 }
 
@@ -116,12 +146,43 @@ impl<'de> Deserialize<'de> for DataField {
             D: Deserializer<'de>,
     {
         Ok(DataField{
-            data: custom_serde::base64::deserialize(deserializer)?
+            data: custom_serde::base64_url::deserialize(deserializer)?
         })
     }
 }
 
 impl fmt::Debug for DataField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&custom_serde::base64_url::to_string(self.data.as_slice()))
+    }
+}
+
+#[derive(PartialEq, Clone, Default)]
+pub struct Memo {
+    data: std::vec::Vec<u8>
+}
+
+impl Serialize for Memo {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        custom_serde::base64::serialize(self.data.as_slice(), serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for Memo {
+    fn deserialize<D>(deserializer: D) -> Result<Memo, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        Ok(Memo{
+            data: custom_serde::base64::deserialize(deserializer)?
+        })
+    }
+}
+
+impl fmt::Debug for Memo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&custom_serde::base64::to_string(self.data.as_slice()))
     }
