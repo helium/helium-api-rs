@@ -15,5 +15,3 @@ fn test_rewards() {
     let parsed: Vec<Transaction> = serde_json::from_str(data).unwrap();
     println!("{:?}", parsed)
 }
-
-

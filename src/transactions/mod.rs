@@ -401,7 +401,6 @@ pub mod routing_information {
     }
 }
 
-
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct StateChannelSummary {
     pub client_pubkeybin: Option<Signature>,
@@ -413,11 +412,11 @@ pub struct StateChannelSummary {
 pub struct StateChannelV1 {
     pub id: DataField,
     pub owner: Pubkey,
-//    pub credits: u64,
+    //    pub credits: u64,
     pub nonce: u64,
     pub summaries: ::std::vec::Vec<StateChannelSummary>,
     pub root_hash: String,
-//    pub skewed: DataField,
+    //    pub skewed: DataField,
     pub state: state_channel_v1::State,
     pub expire_at_block: u64,
     pub signature: Option<Signature>,
@@ -428,7 +427,7 @@ pub mod state_channel_v1 {
     #[serde(rename_all = "snake_case")]
     pub enum State {
         Open,
-        Closed
+        Closed,
     }
 }
 
