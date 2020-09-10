@@ -209,7 +209,7 @@ pub struct BlockchainPocReceiptV1 {
     pub timestamp: u64,
     pub signal: i32,
     pub data: DataField,
-    pub origin: i32,
+    pub origin: Origin,
     pub signature: Option<Signature>,
     pub snr: f32,
     pub frequency: f32,
@@ -260,9 +260,10 @@ pub struct PocReceiptsV1 {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum Origin {
-    P2p = 0,
-    Radio = 1,
+    P2p,
+    Radio,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
