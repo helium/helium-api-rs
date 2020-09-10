@@ -104,6 +104,7 @@ pub struct PendingTxnStatus {
 #[derive(Clone, Deserialize, Debug)]
 pub(crate) struct Data<T> {
     pub data: T,
+    cursor: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -141,11 +142,22 @@ impl Client {
     }
 
     pub(crate) fn fetch<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
+        // peel away the cursor from fetch_with_cursor
+        match self.fetch_with_cursor(path) {
+            Ok((data, _cursor)) => Ok(data),
+            Err(e) => Err(e),
+        }
+    }
+
+    pub(crate) fn fetch_with_cursor<T: DeserializeOwned>(
+        &self,
+        path: &str,
+    ) -> Result<(T, Option<String>)> {
         let request_url = format!("{}{}", self.base_url, path);
         let mut response = self.client.get(&request_url).send()?.error_for_status()?;
 
         let result: Data<T> = response.json()?;
-        Ok(result.data)
+        Ok((result.data, result.cursor))
     }
 
     pub(crate) fn post<T: Serialize + ?Sized, R: DeserializeOwned>(
@@ -164,9 +176,84 @@ impl Client {
         Ok(result.data)
     }
 
+    /// Get current oracle price
+    pub fn get_oracle_price(&self) -> Result<(u64, u64)> {
+        #[derive(Clone, Debug, Deserialize)]
+        struct Data {
+            price: u64,
+            block: u64,
+        }
+        let data = self.fetch::<Data>("/oracle/prices/current")?;
+        Ok((data.price, data.block))
+    }
+
+    /// Get oracle price at a specific block height
+    pub fn get_oracle_price_at_height(&self, height: usize) -> Result<(u64, u64)> {
+        #[derive(Clone, Debug, Deserialize)]
+        struct Data {
+            price: u64,
+            block: u64,
+        }
+        let data = self.fetch::<Data>(&format!("/oracle/prices/{}", height))?;
+        Ok((data.price, data.block))
+    }
+
     /// Get wallet information for a given address
     pub fn get_account(&self, address: &str) -> Result<Account> {
         self.fetch::<Account>(&format!("/accounts/{}", address))
+    }
+
+    /// Get transactions associated to a given account
+    pub fn get_account_transactions(
+        &self,
+        address: &str,
+    ) -> Result<(Option<Vec<Transaction>>, Option<String>)> {
+        let (transactions, cursor) =
+            self.fetch_with_cursor::<Vec<Transaction>>(&format!("/accounts/{}/activity", address))?;
+
+        // For some reason, the first fetch sometimes returns a cursor and nothing else
+        if transactions.is_empty() && cursor.is_some() {
+            if let Some(cursor) = cursor {
+                self.get_more_account_transactions(address, cursor.as_str())
+            } else {
+                Ok((None, cursor))
+            }
+        } else {
+            Ok((Some(transactions), None))
+        }
+    }
+
+    /// Get more transactions associated to a given account
+    pub fn get_more_account_transactions(
+        &self,
+        address: &str,
+        cursor: &str,
+    ) -> Result<(Option<Vec<Transaction>>, Option<String>)> {
+        let (transactions, cursor) = self.fetch_with_cursor::<Vec<Transaction>>(&format!(
+            "/accounts/{}/activity?cursor={}",
+            address, cursor
+        ))?;
+        if transactions.is_empty() {
+            Ok((None, cursor))
+        } else {
+            Ok((Some(transactions), cursor))
+        }
+    }
+
+    /// Get transactions from a given block
+    pub fn get_block_transactions(&self, block: u64) -> Result<(Vec<Transaction>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<Transaction>>(&format!("/blocks/{}/transactions", block))
+    }
+
+    pub fn get_more_block_transactions(
+        &self,
+        block: u64,
+        cursor: &str,
+    ) -> Result<(Vec<Transaction>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<Transaction>>(&format!(
+            "/blocks/{}/transactions?cursor={}",
+            block, cursor
+        ))
     }
 
     /// Get the current block height
