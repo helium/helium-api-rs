@@ -10,7 +10,11 @@ pub struct Signature {
 
 impl fmt::Display for Signature {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", custom_serde::base64_url::to_string(self.data.as_slice()))
+        write!(
+            f,
+            "{}",
+            custom_serde::base64_url::to_string(self.data.as_slice())
+        )
     }
 }
 
@@ -47,7 +51,11 @@ pub struct Pubkey {
 
 impl fmt::Display for Pubkey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", custom_serde::base58::to_string(self.data.as_slice()))
+        write!(
+            f,
+            "{}",
+            custom_serde::base58::to_string(self.data.as_slice())
+        )
     }
 }
 
@@ -90,7 +98,11 @@ pub struct Hash {
 
 impl fmt::Display for Hash {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", custom_serde::base64_url::to_string(self.data.as_slice()))
+        write!(
+            f,
+            "{}",
+            custom_serde::base64_url::to_string(self.data.as_slice())
+        )
     }
 }
 
