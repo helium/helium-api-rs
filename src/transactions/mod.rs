@@ -334,9 +334,9 @@ pub struct TokenBurnV1 {
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
-    // pub nonce: u64,
-    // pub signature: Option<Signature>,
-    // pub fee: Option<u64>,
+    pub nonce: u64,
+    pub signature: Option<Signature>,
+    pub fee: Option<u64>,
     // pub memo: Memo,
 }
 
