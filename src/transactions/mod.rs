@@ -20,10 +20,10 @@ pub enum Transaction {
     PocRequestV1(PocRequestV1),
     RedeemHtlcV1(RedeemHtlcV1),
     SecurityCoinbaseV1(SecurityCoinbaseV1),
-    RoutingV1(TxnRoutingV1),
+    RoutingV1(RoutingV1),
     SecurityExchangeV1(SecurityExchangeV1),
     VarsV1(VarsV1),
-    RewardsV1(RewardV1),
+    RewardsV1(RewardsV1),
     TokenBurnV1(TokenBurnV1),
     DcCoinbaseV1(DcCoinbaseV1),
     TokenBurnExchangeRateV1(TokenBurnExchangeRateV1),
@@ -38,18 +38,27 @@ pub enum Transaction {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct CoinbaseV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub payee: Pubkey,
     pub amount: u64,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SecurityCoinbaseV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub payee: Pubkey,
     pub amount: u64,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct OuiV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub owner: Pubkey,
     pub addresses: Vec<Pubkey>,
     pub filter: DataField,
@@ -64,6 +73,9 @@ pub struct OuiV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct GenGatewayV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub gateway: Pubkey,
     pub owner: Pubkey,
     pub location: DataField,
@@ -82,7 +94,10 @@ pub struct UpdateXor {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct TxnRoutingV1 {
+pub struct RoutingV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub oui: u32,
     pub owner: Pubkey,
     pub fee: u64,
@@ -107,7 +122,7 @@ pub mod blockchain_txn_routing_v1 {
 pub struct PaymentV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
@@ -120,7 +135,7 @@ pub struct PaymentV1 {
 pub struct SecurityExchangeV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
@@ -131,6 +146,8 @@ pub struct SecurityExchangeV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ConsensusGroupV1 {
+    pub time: usize,
+    pub hash: Hash,
     pub members: ::std::vec::Vec<Pubkey>,
     pub proof: DataField,
     pub height: u64,
@@ -141,7 +158,7 @@ pub struct ConsensusGroupV1 {
 pub struct AddGatewayV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub owner: Pubkey,
     pub gateway: Pubkey,
     pub owner_signature: Option<Signature>,
@@ -156,7 +173,7 @@ pub struct AddGatewayV1 {
 pub struct AssertLocationV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub gateway: Pubkey,
     pub owner: Pubkey,
     pub payer: Pubkey,
@@ -173,7 +190,7 @@ pub struct AssertLocationV1 {
 pub struct CreateHtlcV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub address: DataField,
@@ -189,7 +206,7 @@ pub struct CreateHtlcV1 {
 pub struct RedeemHtlcV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payee: Pubkey,
     pub address: DataField,
     pub preimage: DataField,
@@ -201,7 +218,7 @@ pub struct RedeemHtlcV1 {
 pub struct PocRequestV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub challenger: Pubkey,
     pub secret_hash: Hash,
     pub onion_key_hash: Hash,
@@ -215,7 +232,7 @@ pub struct PocRequestV1 {
 pub struct BlockchainPocReceiptV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub gateway: Pubkey,
     pub timestamp: u64,
     pub signal: i32,
@@ -230,7 +247,7 @@ pub struct BlockchainPocReceiptV1 {
 pub struct BlockchainPocWitnessV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub gateway: Pubkey,
     pub timestamp: u64,
     pub signal: i32,
@@ -264,7 +281,7 @@ pub struct BlockchainPocPathElementV1 {
 pub struct PocReceiptsV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub challenger: Pubkey,
     pub secret: DataField,
     pub onion_key_hash: Hash,
@@ -289,6 +306,9 @@ pub struct BlockchainVarV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct VarsV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub vars: ::std::vec::Vec<BlockchainVarV1>,
     pub version_predicate: u32,
     pub proof: DataField,
@@ -318,7 +338,7 @@ pub struct RewardData {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct RewardV1 {
+pub struct RewardsV1 {
     pub time: usize,
     pub height: u64,
     pub hash: Hash,
@@ -344,13 +364,16 @@ pub struct TokenBurnV1 {
 pub struct DcCoinbaseV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payee: Pubkey,
     pub amount: u64,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct TokenBurnExchangeRateV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub rate: u64,
 }
 
@@ -358,7 +381,7 @@ pub struct TokenBurnExchangeRateV1 {
 pub struct StateChannelOpenV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub id: DataField,
     pub owner: Pubkey,
     pub amount: i64,
@@ -373,7 +396,7 @@ pub struct StateChannelOpenV1 {
 pub struct UpdateGatewayOuiV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub gateway: Pubkey,
     pub oui: u64,
     pub nonce: u64,
@@ -435,7 +458,7 @@ pub mod state_channel_v1 {
 pub struct StateChannelCloseV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub state_channel: ::std::option::Option<StateChannelV1>,
     pub closer: Pubkey,
     pub signature: Option<Signature>,
@@ -447,7 +470,7 @@ pub struct StateChannelCloseV1 {
 pub struct PaymentV2 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub payer: Pubkey,
     pub payments: ::std::vec::Vec<Payment>,
     pub fee: u64,
@@ -465,7 +488,7 @@ pub struct Payment {
 pub struct PriceOracleV1 {
     pub time: usize,
     pub height: u64,
-    pub hash: String,
+    pub hash: Hash,
     pub public_key: Pubkey,
     pub price: u64,
     pub block_height: u64,
@@ -474,11 +497,17 @@ pub struct PriceOracleV1 {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct GenPriceOracleV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub price: u64,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct BundleV1 {
+    pub time: usize,
+    pub height: u64,
+    pub hash: Hash,
     pub transactions: ::std::vec::Vec<BlockchainTxn>,
 }
 

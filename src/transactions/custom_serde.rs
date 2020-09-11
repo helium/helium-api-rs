@@ -19,6 +19,7 @@ pub mod base58 {
     {
         let s = <&str>::deserialize(deserializer)?;
         bs58::decode(s).into_vec().map_err(de::Error::custom)
+
     }
 }
 

@@ -49,6 +49,14 @@ pub struct Pubkey {
     data: std::vec::Vec<u8>,
 }
 
+impl Pubkey {
+    pub fn from_vec(vec: std::vec::Vec<u8>) -> Pubkey {
+        Pubkey {
+            data: vec
+        }
+    }
+}
+
 impl fmt::Display for Pubkey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -56,12 +64,6 @@ impl fmt::Display for Pubkey {
             "{}",
             custom_serde::base58::to_string(self.data.as_slice())
         )
-    }
-}
-
-impl PartialEq<&str> for Pubkey {
-    fn eq(&self, other: &&str) -> bool {
-        custom_serde::base64_url::to_string(self.data.as_slice()).as_str() == *other
     }
 }
 
@@ -103,12 +105,6 @@ impl fmt::Display for Hash {
             "{}",
             custom_serde::base64_url::to_string(self.data.as_slice())
         )
-    }
-}
-
-impl PartialEq<&str> for Hash {
-    fn eq(&self, other: &&str) -> bool {
-        custom_serde::base64_url::to_string(self.data.as_slice()).as_str() == *other
     }
 }
 
