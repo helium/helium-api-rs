@@ -51,9 +51,7 @@ pub struct Pubkey {
 
 impl Pubkey {
     pub fn from_vec(vec: std::vec::Vec<u8>) -> Pubkey {
-        Pubkey {
-            data: vec
-        }
+        Pubkey { data: vec }
     }
 }
 
