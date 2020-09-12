@@ -219,7 +219,7 @@ impl Client {
                 Ok((None, cursor))
             }
         } else {
-            Ok((Some(transactions), None))
+            Ok((Some(transactions), cursor))
         }
     }
 
