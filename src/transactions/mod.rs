@@ -64,8 +64,8 @@ pub struct OuiV1 {
     pub filter: DataField,
     pub requested_subnet_size: u32,
     pub payer: Pubkey,
-    pub staking_fee: u64,
-    pub fee: u64,
+    pub staking_fee: Option<u64>,
+    pub fee: Option<u64>,
     pub owner_signature: Option<Signature>,
     pub payer_signature: Option<Signature>,
     pub oui: u64,
@@ -100,7 +100,7 @@ pub struct RoutingV1 {
     pub hash: Hash,
     pub oui: u32,
     pub owner: Pubkey,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub nonce: u64,
     pub signature: Option<Signature>,
     pub staking_fee: Option<u64>,
@@ -126,7 +126,7 @@ pub struct PaymentV1 {
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub nonce: u64,
     pub signature: Option<Signature>,
 }
@@ -139,7 +139,7 @@ pub struct SecurityExchangeV1 {
     pub payer: Pubkey,
     pub payee: Pubkey,
     pub amount: u64,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub nonce: u64,
     pub signature: Option<Signature>,
 }
@@ -165,8 +165,8 @@ pub struct AddGatewayV1 {
     pub gateway_signature: Option<Signature>,
     pub payer: Pubkey,
     pub payer_signature: Signature,
-    pub staking_fee: u64,
-    pub fee: u64,
+    pub staking_fee: Option<u64>,
+    pub fee: Option<u64>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -182,8 +182,8 @@ pub struct AssertLocationV1 {
     pub payer_signature: Option<Signature>,
     pub location: String,
     pub nonce: u64,
-    pub staking_fee: u64,
-    pub fee: u64,
+    pub staking_fee: Option<u64>,
+    pub fee: Option<u64>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -197,7 +197,7 @@ pub struct CreateHtlcV1 {
     pub hashlock: DataField,
     pub timelock: u64,
     pub amount: u64,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub signature: Option<Signature>,
     pub nonce: u64,
 }
@@ -210,7 +210,7 @@ pub struct RedeemHtlcV1 {
     pub payee: Pubkey,
     pub address: DataField,
     pub preimage: DataField,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub signature: Option<Signature>,
 }
 
@@ -223,7 +223,7 @@ pub struct PocRequestV1 {
     pub secret_hash: Hash,
     pub onion_key_hash: Hash,
     pub block_hash: Hash,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub signature: Option<Signature>,
     pub version: u32,
 }
@@ -286,7 +286,7 @@ pub struct PocReceiptsV1 {
     pub secret: DataField,
     pub onion_key_hash: Hash,
     pub path: ::std::vec::Vec<BlockchainPocPathElementV1>,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub signature: Option<Signature>,
 }
 
@@ -389,7 +389,7 @@ pub struct StateChannelOpenV1 {
     pub oui: u64,
     pub nonce: u64,
     pub signature: Option<Signature>,
-    pub fee: u64,
+    pub fee: Option<u64>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -400,7 +400,7 @@ pub struct UpdateGatewayOuiV1 {
     pub gateway: Pubkey,
     pub oui: u64,
     pub nonce: u64,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub gateway_owner_signature: Option<Signature>,
     pub oui_owner_signature: Option<Signature>,
 }
@@ -473,7 +473,7 @@ pub struct PaymentV2 {
     pub hash: Hash,
     pub payer: Pubkey,
     pub payments: ::std::vec::Vec<Payment>,
-    pub fee: u64,
+    pub fee: Option<u64>,
     pub nonce: u64,
     pub signature: Option<Signature>,
 }
