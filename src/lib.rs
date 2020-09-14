@@ -6,6 +6,8 @@ extern crate serde_json;
 mod hnt;
 pub use hnt::Hnt;
 
+mod transactions;
+
 pub use helium_proto::*;
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;

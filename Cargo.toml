@@ -13,4 +13,5 @@ serde_derive = "1"
 serde_json = "1"
 base64 = "0"
 rust_decimal = {version = "1", features = ["serde-float"] }
-helium-proto = { git = "https://github.com/helium/proto", branch="master"}
+#helium-proto = { git = "https://github.com/helium/proto", branch="lthiery/rust-add-serde"}
+helium-proto = {  path = "../proto"}
