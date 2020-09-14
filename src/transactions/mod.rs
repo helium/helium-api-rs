@@ -38,7 +38,7 @@ struct ApiJson<T>
 }
 
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Transaction {
     AddGatewayV1(AddGatewayV1),
@@ -67,6 +67,27 @@ pub enum Transaction {
     PriceOracleV1(PriceOracleV1),
     GenPriceOracleV1(GenPriceOracleV1),
     BundleV1(BundleV1),
+}
+
+// Use the JSON Serializiation for debug printing
+use std::fmt;
+impl fmt::Display for Transaction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let str = serde_json::to_string(self).unwrap();
+
+        write!(
+            f,
+            "{}",
+            str
+        )
+    }
+}
+impl fmt::Debug for Transaction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let str = serde_json::to_string(self).unwrap();
+
+        f.write_str(&str)
+    }
 }
 
 #[cfg(test)]

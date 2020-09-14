@@ -7,6 +7,7 @@ mod hnt;
 pub use hnt::Hnt;
 
 mod transactions;
+pub use transactions::*;
 
 pub use helium_proto::*;
 use serde::{de::DeserializeOwned, Serialize};
