@@ -206,9 +206,9 @@ impl Client {
     pub fn get_account_transactions(
         &self,
         address: &str,
-    ) -> Result<(Option<Vec<transactions::ApiJson<Transaction>>>, Option<String>)> {
+    ) -> Result<(Option<Vec<transactions::ApiJson>>, Option<String>)> {
         let (transactions, cursor) =
-            self.fetch_with_cursor::<Vec<transactions::ApiJson<Transaction>>>(&format!("/accounts/{}/activity", address))?;
+            self.fetch_with_cursor::<Vec<transactions::ApiJson>>(&format!("/accounts/{}/activity", address))?;
 
         // For some reason, the first fetch sometimes returns a cursor and nothing else
         if transactions.is_empty() && cursor.is_some() {
@@ -227,8 +227,8 @@ impl Client {
         &self,
         address: &str,
         cursor: &str,
-    ) -> Result<(Option<Vec<transactions::ApiJson<Transaction>>>, Option<String>)> {
-        let (transactions, cursor) = self.fetch_with_cursor::<Vec<transactions::ApiJson<Transaction>>>(&format!(
+    ) -> Result<(Option<Vec<transactions::ApiJson>>, Option<String>)> {
+        let (transactions, cursor) = self.fetch_with_cursor::<Vec<transactions::ApiJson>>(&format!(
             "/accounts/{}/activity?cursor={}",
             address, cursor
         ))?;
