@@ -28,7 +28,7 @@ pub use helium_proto::{
     BlockchainTxnBundleV1 as BundleV1,
 };
 #[derive(Debug, Serialize, Deserialize)]
-struct ApiJson<T>
+pub struct ApiJson<T>
 {
     time: usize,
     height: usize,
