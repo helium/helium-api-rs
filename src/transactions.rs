@@ -1,42 +1,30 @@
-use serde::{Serialize, Deserialize};
 pub use helium_proto::{
-    BlockchainTxnAddGatewayV1 as AddGatewayV1,
-    BlockchainTxnAssertLocationV1 as AssertLocationV1,
-    BlockchainTxnCoinbaseV1 as CoinbaseV1,
-    BlockchainTxnCreateHtlcV1 as CreateHtlcV1,
-    BlockchainTxnGenGatewayV1 as GenGatewayV1,
-    BlockchainTxnConsensusGroupV1 as ConsensusGroupV1,
-    BlockchainTxnOuiV1 as OuiV1,
-    BlockchainTxnPaymentV1 as PaymentV1,
-    BlockchainTxnPocReceiptsV1 as PocReceiptsV1,
-    BlockchainTxnPocRequestV1 as PocRequestV1,
-    BlockchainTxnRedeemHtlcV1 as RedeemHtlcV1,
+    BlockchainTxnAddGatewayV1 as AddGatewayV1, BlockchainTxnAssertLocationV1 as AssertLocationV1,
+    BlockchainTxnBundleV1 as BundleV1, BlockchainTxnCoinbaseV1 as CoinbaseV1,
+    BlockchainTxnConsensusGroupV1 as ConsensusGroupV1, BlockchainTxnCreateHtlcV1 as CreateHtlcV1,
+    BlockchainTxnDcCoinbaseV1 as DcCoinbaseV1, BlockchainTxnGenGatewayV1 as GenGatewayV1,
+    BlockchainTxnGenPriceOracleV1 as GenPriceOracleV1, BlockchainTxnOuiV1 as OuiV1,
+    BlockchainTxnPaymentV1 as PaymentV1, BlockchainTxnPaymentV2 as PaymentV2,
+    BlockchainTxnPocReceiptsV1 as PocReceiptsV1, BlockchainTxnPocRequestV1 as PocRequestV1,
+    BlockchainTxnPriceOracleV1 as PriceOracleV1, BlockchainTxnRedeemHtlcV1 as RedeemHtlcV1,
+    BlockchainTxnRewardsV1 as RewardsV1, BlockchainTxnRoutingV1 as RoutingV1,
     BlockchainTxnSecurityCoinbaseV1 as SecurityCoinbaseV1,
-    BlockchainTxnRoutingV1 as RoutingV1,
     BlockchainTxnSecurityExchangeV1 as SecurityExchangeV1,
-    BlockchainTxnVarsV1 as VarsV1,
-    BlockchainTxnRewardsV1 as RewardsV1,
-    BlockchainTxnTokenBurnV1 as TokenBurnV1,
-    BlockchainTxnDcCoinbaseV1 as DcCoinbaseV1,
-    BlockchainTxnTokenBurnExchangeRateV1 as TokenBurnExchangeRateV1,
-    BlockchainTxnStateChannelOpenV1 as StateChannelOpenV1,
-    BlockchainTxnUpdateGatewayOuiV1 as UpdateGatewayOuiV1,
     BlockchainTxnStateChannelCloseV1 as StateChannelCloseV1,
-    BlockchainTxnPaymentV2 as PaymentV2,
-    BlockchainTxnPriceOracleV1 as PriceOracleV1,
-    BlockchainTxnGenPriceOracleV1 as GenPriceOracleV1,
-    BlockchainTxnBundleV1 as BundleV1,
+    BlockchainTxnStateChannelOpenV1 as StateChannelOpenV1,
+    BlockchainTxnTokenBurnExchangeRateV1 as TokenBurnExchangeRateV1,
+    BlockchainTxnTokenBurnV1 as TokenBurnV1, BlockchainTxnUpdateGatewayOuiV1 as UpdateGatewayOuiV1,
+    BlockchainTxnVarsV1 as VarsV1,
 };
+use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ApiJson
-{
+pub struct ApiJson {
     pub time: usize,
     pub height: usize,
     pub hash: String,
     #[serde(flatten)]
     pub data: Transaction,
 }
-
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -75,11 +63,7 @@ impl fmt::Display for Transaction {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let str = serde_json::to_string(self).unwrap();
 
-        write!(
-            f,
-            "{}",
-            str
-        )
+        write!(f, "{}", str)
     }
 }
 impl fmt::Debug for Transaction {
@@ -92,8 +76,8 @@ impl fmt::Debug for Transaction {
 
 #[cfg(test)]
 mod test {
-    use serde_json;
     use super::*;
+    use serde_json;
 
     #[test]
     fn test_poc_request() {
@@ -109,6 +93,3 @@ mod test {
         println!("{:?}", parsed)
     }
 }
-
-
-
