@@ -207,9 +207,8 @@ impl Client {
         &self,
         address: &str,
     ) -> Result<(Option<Vec<Transaction>>, Option<String>)> {
-        let (transactions, cursor) = self.fetch_with_cursor::<Vec<Transaction>>(
-            &format!("/accounts/{}/activity", address),
-        )?;
+        let (transactions, cursor) =
+            self.fetch_with_cursor::<Vec<Transaction>>(&format!("/accounts/{}/activity", address))?;
 
         // For some reason, the first fetch sometimes returns a cursor and nothing else
         if transactions.is_empty() && cursor.is_some() {
@@ -229,9 +228,10 @@ impl Client {
         address: &str,
         cursor: &str,
     ) -> Result<(Option<Vec<Transaction>>, Option<String>)> {
-        let (transactions, cursor) = self.fetch_with_cursor::<Vec<Transaction>>(
-            &format!("/accounts/{}/activity?cursor={}", address, cursor),
-        )?;
+        let (transactions, cursor) = self.fetch_with_cursor::<Vec<Transaction>>(&format!(
+            "/accounts/{}/activity?cursor={}",
+            address, cursor
+        ))?;
         if transactions.is_empty() {
             Ok((None, cursor))
         } else {
@@ -262,7 +262,7 @@ impl Client {
     }
 
     /// Get hotspots for a given wallet address
-    pub fn get_hotspots(&self, address: &str) -> Result<Vec<Hotspot>> {
+    pub fn get_account_hotspots(&self, address: &str) -> Result<Vec<Hotspot>> {
         self.fetch::<Vec<Hotspot>>(&format!("/accounts/{}/hotspots", address))
     }
 

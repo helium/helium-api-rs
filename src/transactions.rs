@@ -1,29 +1,26 @@
-pub use helium_proto::{
-    BlockchainTxnAddGatewayV1 as AddGatewayV1, BlockchainTxnAssertLocationV1 as AssertLocationV1,
-    BlockchainTxnBundleV1 as BundleV1, BlockchainTxnCoinbaseV1 as CoinbaseV1,
-    BlockchainTxnConsensusGroupV1 as ConsensusGroupV1, BlockchainTxnCreateHtlcV1 as CreateHtlcV1,
-    BlockchainTxnDcCoinbaseV1 as DcCoinbaseV1, BlockchainTxnGenGatewayV1 as GenGatewayV1,
-    BlockchainTxnGenPriceOracleV1 as GenPriceOracleV1, BlockchainTxnOuiV1 as OuiV1,
-    BlockchainTxnPaymentV1 as PaymentV1, BlockchainTxnPaymentV2 as PaymentV2,
-    BlockchainTxnPocReceiptsV1 as PocReceiptsV1, BlockchainTxnPocRequestV1 as PocRequestV1,
-    BlockchainTxnPriceOracleV1 as PriceOracleV1, BlockchainTxnRedeemHtlcV1 as RedeemHtlcV1,
-    BlockchainTxnRewardsV1 as RewardsV1, BlockchainTxnRoutingV1 as RoutingV1,
-    BlockchainTxnSecurityCoinbaseV1 as SecurityCoinbaseV1,
-    BlockchainTxnSecurityExchangeV1 as SecurityExchangeV1,
-    BlockchainTxnStateChannelCloseV1 as StateChannelCloseV1,
-    BlockchainTxnStateChannelOpenV1 as StateChannelOpenV1,
-    BlockchainTxnTokenBurnExchangeRateV1 as TokenBurnExchangeRateV1,
-    BlockchainTxnTokenBurnV1 as TokenBurnV1, BlockchainTxnUpdateGatewayOuiV1 as UpdateGatewayOuiV1,
-    BlockchainTxnVarsV1 as VarsV1,
-};
+pub use helium_proto::*;
+
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Transaction {
     pub time: usize,
-    pub height: usize,
+    #[serde(default)]
+    pub height: Option<usize>,
     pub hash: String,
     #[serde(flatten)]
     pub data: Data,
+}
+
+// by default, Api's version of the txn has at least the proto data
+// custom structs may be added with more "value-added" fields
+macro_rules! default_data {
+    ($txn:tt, $txn_proto:tt) => {
+        #[derive(Debug, Clone, Serialize, Deserialize)]
+        pub struct $txn {
+            #[serde(flatten)]
+            pub proto: $txn_proto,
+        }
+    };
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -56,6 +53,36 @@ pub enum Data {
     GenPriceOracleV1(GenPriceOracleV1),
     BundleV1(BundleV1),
 }
+
+default_data!(AddGatewayV1, BlockchainTxnAddGatewayV1);
+default_data!(AssertLocationV1, BlockchainTxnAssertLocationV1);
+default_data!(CoinbaseV1, BlockchainTxnCoinbaseV1);
+default_data!(CreateHtlcV1, BlockchainTxnCreateHtlcV1);
+default_data!(GenGatewayV1, BlockchainTxnGenGatewayV1);
+default_data!(ConsensusGroupV1, BlockchainTxnConsensusGroupV1);
+default_data!(OuiV1, BlockchainTxnOuiV1);
+default_data!(PaymentV1, BlockchainTxnPaymentV1);
+default_data!(PocReceiptsV1, BlockchainTxnPocReceiptsV1);
+default_data!(PocRequestV1, BlockchainTxnPocRequestV1);
+default_data!(RedeemHtlcV1, BlockchainTxnRedeemHtlcV1);
+default_data!(SecurityCoinbaseV1, BlockchainTxnSecurityCoinbaseV1);
+default_data!(RoutingV1, BlockchainTxnRoutingV1);
+default_data!(SecurityExchangeV1, BlockchainTxnSecurityExchangeV1);
+default_data!(VarsV1, BlockchainTxnVarsV1);
+default_data!(RewardsV1, BlockchainTxnRewardsV1);
+default_data!(TokenBurnV1, BlockchainTxnTokenBurnV1);
+default_data!(DcCoinbaseV1, BlockchainTxnDcCoinbaseV1);
+default_data!(
+    TokenBurnExchangeRateV1,
+    BlockchainTxnTokenBurnExchangeRateV1
+);
+default_data!(StateChannelOpenV1, BlockchainTxnStateChannelOpenV1);
+default_data!(UpdateGatewayOuiV1, BlockchainTxnUpdateGatewayOuiV1);
+default_data!(StateChannelCloseV1, BlockchainTxnStateChannelCloseV1);
+default_data!(PaymentV2, BlockchainTxnPaymentV2);
+default_data!(PriceOracleV1, BlockchainTxnPriceOracleV1);
+default_data!(GenPriceOracleV1, BlockchainTxnGenPriceOracleV1);
+default_data!(BundleV1, BlockchainTxnBundleV1);
 
 // Use the JSON Serializiation for debug printing
 use std::fmt;
