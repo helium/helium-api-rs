@@ -206,8 +206,8 @@ impl Client {
     pub fn get_account_transactions(
         &self,
         address: &str,
-    ) -> Result<(Option<Vec<transactions::ApiJson>>, Option<String>)> {
-        let (transactions, cursor) = self.fetch_with_cursor::<Vec<transactions::ApiJson>>(
+    ) -> Result<(Option<Vec<Transaction>>, Option<String>)> {
+        let (transactions, cursor) = self.fetch_with_cursor::<Vec<Transaction>>(
             &format!("/accounts/{}/activity", address),
         )?;
 
@@ -228,8 +228,8 @@ impl Client {
         &self,
         address: &str,
         cursor: &str,
-    ) -> Result<(Option<Vec<transactions::ApiJson>>, Option<String>)> {
-        let (transactions, cursor) = self.fetch_with_cursor::<Vec<transactions::ApiJson>>(
+    ) -> Result<(Option<Vec<Transaction>>, Option<String>)> {
+        let (transactions, cursor) = self.fetch_with_cursor::<Vec<Transaction>>(
             &format!("/accounts/{}/activity?cursor={}", address, cursor),
         )?;
         if transactions.is_empty() {
@@ -249,7 +249,7 @@ impl Client {
         block: u64,
         cursor: &str,
     ) -> Result<(Vec<Transaction>, Option<String>)> {
-        self.fetch_with_cursor::<Vec<Transaction>>(&format!(
+        self.fetch_with_cursor::<Vec<transactions::Transaction>>(&format!(
             "/blocks/{}/transactions?cursor={}",
             block, cursor
         ))
