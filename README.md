@@ -1,1 +1,1 @@
-[![Build Status](https://travis-ci.com/helium/helium-api-rs.svg?branch=master)](https://travis-ci.com/helium/helium-api-rs)
+![Continuous Integration](https://github.com/helium/helium-api-rs/workflows/Continuous%20Integration/badge.svg)
