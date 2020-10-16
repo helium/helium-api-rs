@@ -42,6 +42,16 @@ pub struct Account {
     pub speculative_sec_nonce: u64,
 }
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
+/// Represents block metadata on the blockchain
+pub struct Block {
+    pub transactions_count: usize,
+    pub time: usize,
+    pub prev_hash: String,
+    pub hash: String,
+    pub height: usize,
+}
+
 #[derive(Clone, Deserialize, Debug)]
 pub struct Geocode {
     /// The long version of city for the last asserted location
@@ -121,6 +131,13 @@ impl Default for Client {
     }
 }
 
+#[derive(Clone, Deserialize, Debug)]
+/// Represents an oracle price response from the API
+pub struct OraclePrice {
+    pub price: u64,
+    pub block: u64,
+}
+
 impl Client {
     /// Create a new client using a given base URL and a default
     /// timeout. The library will use absoluate paths based on this
@@ -176,25 +193,31 @@ impl Client {
     }
 
     /// Get current oracle price
-    pub fn get_oracle_price(&self) -> Result<(u64, u64)> {
-        #[derive(Clone, Debug, Deserialize)]
-        struct Data {
-            price: u64,
-            block: u64,
-        }
-        let data = self.fetch::<Data>("/oracle/prices/current")?;
-        Ok((data.price, data.block))
+    pub fn get_oracle_price(&self) -> Result<OraclePrice> {
+        self.fetch::<OraclePrice>("/oracle/prices/current")
     }
 
     /// Get oracle price at a specific block height
-    pub fn get_oracle_price_at_height(&self, height: usize) -> Result<(u64, u64)> {
-        #[derive(Clone, Debug, Deserialize)]
-        struct Data {
-            price: u64,
-            block: u64,
-        }
-        let data = self.fetch::<Data>(&format!("/oracle/prices/{}", height))?;
-        Ok((data.price, data.block))
+    pub fn get_oracle_price_at_height(&self, height: usize) -> Result<OraclePrice> {
+       self.fetch::<OraclePrice>(&format!("/oracle/prices/{}", height))
+    }
+
+    /// Get transactions associated to a given account
+    pub fn get_oracle_prices(
+        &self,
+    ) -> Result<(Vec<OraclePrice>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<OraclePrice>>("/oracle/prices")
+    }
+
+    /// Get more transactions associated to a given account
+    pub fn get_more_oracle_prices(
+        &self,
+        cursor: &str,
+    ) -> Result<(Vec<OraclePrice>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<OraclePrice>>(&format!(
+            "/oracle/prices?cursor={}",
+            cursor
+        ))
     }
 
     /// Get wallet information for a given address
@@ -239,11 +262,29 @@ impl Client {
         }
     }
 
+    /// Get a specific transaction by hash
+    pub fn get_transaction(
+        &self,
+        hash: &str,
+    ) -> Result<Transaction> {
+        self.fetch::<Transaction>(&format!(
+            "/transactions/{}",
+            hash
+        ))
+
+    }
+
+    /// Get metadata transactions from a given block
+    pub fn get_block(&self, block: u64) -> Result<Block> {
+        self.fetch::<Block>(&format!("/blocks/{}", block))
+    }
+
     /// Get transactions from a given block
     pub fn get_block_transactions(&self, block: u64) -> Result<(Vec<Transaction>, Option<String>)> {
         self.fetch_with_cursor::<Vec<Transaction>>(&format!("/blocks/{}/transactions", block))
     }
 
+    /// Get additional transactions from the block using cursor
     pub fn get_more_block_transactions(
         &self,
         block: u64,
@@ -261,6 +302,16 @@ impl Client {
         Ok(result.height)
     }
 
+    /// Get list of all hotspots
+    pub fn get_hotspots(&self) -> Result<(Vec<Hotspot>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<Hotspot>>("/hotspots")
+    }
+
+    /// Get additional hotspots using cursor
+    pub fn get_more_hotspots(&self, cursor: &str) -> Result<(Vec<Hotspot>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<Hotspot>>(&format!("/hotspots?cursor={}", cursor))
+    }
+
     /// Get hotspots for a given wallet address
     pub fn get_account_hotspots(&self, address: &str) -> Result<Vec<Hotspot>> {
         self.fetch::<Vec<Hotspot>>(&format!("/accounts/{}/hotspots", address))
@@ -269,6 +320,26 @@ impl Client {
     /// Get details for a given hotspot address
     pub fn get_hotspot(&self, address: &str) -> Result<Hotspot> {
         self.fetch::<Hotspot>(&format!("/hotspots/{}", address))
+    }
+
+    /// Get activity for a given hotspot address
+    pub fn get_hotspot_activity(
+        &self,
+        address: &str,
+    ) -> Result<(Vec<Transaction>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<Transaction>>(&format!("/hotspots/{}/activity", address))
+    }
+
+    /// Get activity for a given hotspot address
+    pub fn get_more_hotspot_activity(
+        &self,
+        address: &str,
+        cursor: &str,
+    ) -> Result<(Vec<Transaction>, Option<String>)> {
+        self.fetch_with_cursor::<Vec<Transaction>>(&format!(
+            "/hotspots/{}/activity?cursor={}",
+            address, cursor
+        ))
     }
 
     /// Get the current active set of chain variables

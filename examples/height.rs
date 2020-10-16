@@ -5,7 +5,7 @@ fn main() {
     match client.get_height() {
         Ok(height) => {
             println!("Block Height: {}", height);
-            match client.get_block_transactions(height) {
+            match client.get_block_transactions(560476) {
                 Ok((transactions, _cursor)) => {
                     println!("Transactions:");
                     for txn in transactions {
