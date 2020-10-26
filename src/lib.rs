@@ -199,13 +199,11 @@ impl Client {
 
     /// Get oracle price at a specific block height
     pub fn get_oracle_price_at_height(&self, height: usize) -> Result<OraclePrice> {
-       self.fetch::<OraclePrice>(&format!("/oracle/prices/{}", height))
+        self.fetch::<OraclePrice>(&format!("/oracle/prices/{}", height))
     }
 
     /// Get transactions associated to a given account
-    pub fn get_oracle_prices(
-        &self,
-    ) -> Result<(Vec<OraclePrice>, Option<String>)> {
+    pub fn get_oracle_prices(&self) -> Result<(Vec<OraclePrice>, Option<String>)> {
         self.fetch_with_cursor::<Vec<OraclePrice>>("/oracle/prices")
     }
 
@@ -214,10 +212,7 @@ impl Client {
         &self,
         cursor: &str,
     ) -> Result<(Vec<OraclePrice>, Option<String>)> {
-        self.fetch_with_cursor::<Vec<OraclePrice>>(&format!(
-            "/oracle/prices?cursor={}",
-            cursor
-        ))
+        self.fetch_with_cursor::<Vec<OraclePrice>>(&format!("/oracle/prices?cursor={}", cursor))
     }
 
     /// Get wallet information for a given address
@@ -263,15 +258,8 @@ impl Client {
     }
 
     /// Get a specific transaction by hash
-    pub fn get_transaction(
-        &self,
-        hash: &str,
-    ) -> Result<Transaction> {
-        self.fetch::<Transaction>(&format!(
-            "/transactions/{}",
-            hash
-        ))
-
+    pub fn get_transaction(&self, hash: &str) -> Result<Transaction> {
+        self.fetch::<Transaction>(&format!("/transactions/{}", hash))
     }
 
     /// Get metadata transactions from a given block
