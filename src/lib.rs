@@ -5,6 +5,8 @@ extern crate serde_json;
 
 mod hnt;
 pub use hnt::Hnt;
+mod hst;
+pub use hst::Hst;
 
 pub use helium_proto::*;
 use serde::{de::DeserializeOwned, Serialize};
