@@ -88,11 +88,6 @@ pub struct Hotspot {
     pub location: Option<String>, // h3
     /// The geocode information for the hotspot loocation
     pub geocode: Geocode,
-    /// The current known score of the hotspos
-    pub score: f32,
-    /// The last block the score for the hotspot was updated. None if
-    /// the score was never updated.
-    pub score_update_height: Option<u64>,
 }
 
 #[derive(Clone, Deserialize, Debug)]
