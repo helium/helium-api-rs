@@ -86,13 +86,8 @@ pub struct Hotspot {
     /// The h3 index based on the lat/lon of the hotspot is used for
     /// PoC challenges.
     pub location: Option<String>, // h3
-    /// The geocode information for the hotspot loocation
+    /// The geocode information for the hotspot location
     pub geocode: Geocode,
-    /// The current known score of the hotspos
-    pub score: f32,
-    /// The last block the score for the hotspot was updated. None if
-    /// the score was never updated.
-    pub score_update_height: Option<u64>,
 }
 
 #[derive(Clone, Deserialize, Debug)]
