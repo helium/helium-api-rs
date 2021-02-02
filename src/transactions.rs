@@ -4,8 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Transaction {
     pub time: usize,
-    #[serde(default)]
-    pub height: Option<usize>,
+    pub height: usize,
     pub hash: String,
     #[serde(flatten)]
     pub data: Data,
@@ -52,6 +51,7 @@ pub enum Data {
     PriceOracleV1(PriceOracleV1),
     GenPriceOracleV1(GenPriceOracleV1),
     BundleV1(BundleV1),
+    TransferHotspotV1(TransferHotspotV1),
 }
 
 default_data!(AddGatewayV1, BlockchainTxnAddGatewayV1);
@@ -83,6 +83,7 @@ default_data!(PaymentV2, BlockchainTxnPaymentV2);
 default_data!(PriceOracleV1, BlockchainTxnPriceOracleV1);
 default_data!(GenPriceOracleV1, BlockchainTxnGenPriceOracleV1);
 default_data!(BundleV1, BlockchainTxnBundleV1);
+default_data!(TransferHotspotV1, BlockchainTxnTransferHotspotV1);
 
 // Use the JSON Serializiation for debug printing
 use std::fmt;
