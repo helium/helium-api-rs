@@ -1,23 +1,20 @@
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde_json::json;
 
 mod hnt;
 pub use hnt::Hnt;
 mod hst;
 pub use hst::Hst;
+pub mod error;
 
 pub use helium_proto::*;
-use serde::{de::DeserializeOwned, Serialize};
+// use serde::de::DeserializeOwned;
 use std::time::Duration;
 
 /// The default timeout for API requests
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
 pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
-
-pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents a wallet on the blockchain.
@@ -103,7 +100,7 @@ pub(crate) struct Data<T> {
 #[derive(Clone, Debug)]
 pub struct Client {
     base_url: String,
-    client: reqwest::Client,
+    client: reqwest::blocking::Client,
 }
 
 impl Default for Client {
@@ -126,7 +123,7 @@ impl Client {
     /// timeout value.  The library will use absoluate paths based on
     /// the given base_url.
     pub fn new_with_timeout(base_url: String, timeout: u64) -> Self {
-        let client = reqwest::Client::builder()
+        let client = reqwest::blocking::Client::builder()
             .gzip(true)
             .timeout(Duration::from_secs(timeout))
             .build()
@@ -134,9 +131,9 @@ impl Client {
         Self { base_url, client }
     }
 
-    pub(crate) fn fetch<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
+    pub(crate) fn fetch<T: DeserializeOwned>(&self, path: &str) -> error::Result<T> {
         let request_url = format!("{}{}", self.base_url, path);
-        let mut response = self.client.get(&request_url).send()?.error_for_status()?;
+        let response = self.client.get(&request_url).send()?.error_for_status()?;
         let result: Data<T> = response.json()?;
         Ok(result.data)
     }
@@ -145,9 +142,9 @@ impl Client {
         &self,
         path: &str,
         json: &T,
-    ) -> Result<R> {
+    ) -> error::Result<R> {
         let request_url = format!("{}{}", self.base_url, path);
-        let mut response = self
+        let response = self
             .client
             .post(&request_url)
             .json(json)
@@ -158,47 +155,45 @@ impl Client {
     }
 
     /// Get wallet information for a given address
-    pub fn get_account(&self, address: &str) -> Result<Account> {
+    pub fn get_account(&self, address: &str) -> error::Result<Account> {
         self.fetch::<Account>(&format!("/accounts/{}", address))
     }
 
     /// Get the current block height
-    pub fn get_height(&self) -> Result<u64> {
+    pub fn get_height(&self) -> error::Result<u64> {
         let result = self.fetch::<Height>("/blocks/height")?;
         Ok(result.height)
     }
 
     /// Get hotspots for a given wallet address
-    pub fn get_hotspots(&self, address: &str) -> Result<Vec<Hotspot>> {
+    pub fn get_hotspots(&self, address: &str) -> error::Result<Vec<Hotspot>> {
         self.fetch::<Vec<Hotspot>>(&format!("/accounts/{}/hotspots", address))
     }
 
     /// Get details for a given hotspot address
-    pub fn get_hotspot(&self, address: &str) -> Result<Hotspot> {
+    pub fn get_hotspot(&self, address: &str) -> error::Result<Hotspot> {
         self.fetch::<Hotspot>(&format!("/hotspots/{}", address))
     }
 
     /// Get the current active set of chain variables
-    pub fn get_vars(&self) -> Result<serde_json::Map<String, serde_json::Value>> {
+    pub fn get_vars(&self) -> error::Result<serde_json::Map<String, serde_json::Value>> {
         let result = self.fetch::<serde_json::Value>("/vars")?;
-        match result.as_object() {
-            Some(map) => Ok(map.clone()),
-            None => Err("Expected a chain variable map".into()),
-        }
+        result
+            .as_object()
+            .cloned()
+            .ok_or_else(|| error::value(result))
     }
 
     /// Get the last assigned OUI value
-    pub fn get_last_oui(&self) -> Result<u64> {
+    pub fn get_last_oui(&self) -> error::Result<u64> {
         let result = self.fetch::<serde_json::Value>("/ouis/last")?;
-        match result["oui"].as_u64() {
-            Some(oui) => Ok(oui),
-            None => Err("Expected an oui field".into()),
-        }
+        let oui = result["oui"].clone();
+        oui.as_u64().ok_or_else(|| error::value(oui))
     }
 
     /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
-    pub fn submit_txn(&self, txn: &BlockchainTxn) -> Result<PendingTxnStatus> {
+    pub fn submit_txn(&self, txn: &BlockchainTxn) -> error::Result<PendingTxnStatus> {
         let json = Client::txn_to_json(txn)?;
         self.post("/pending_transactions", &json)
     }
@@ -206,7 +201,7 @@ impl Client {
     /// Convert a given transaction to it's b64 encoded binary
     /// form. The encoded transaction is ready for submission to the
     /// api
-    pub fn txn_to_b64(txn: &BlockchainTxn) -> Result<String> {
+    pub fn txn_to_b64(txn: &BlockchainTxn) -> error::Result<String> {
         let mut buf = vec![];
         txn.encode(&mut buf)?;
         Ok(base64::encode(&buf))
@@ -214,7 +209,7 @@ impl Client {
 
     /// Convert the given transaction to the json that is required to
     /// be submitted to the api endpoint
-    pub fn txn_to_json(txn: &BlockchainTxn) -> Result<serde_json::Value> {
+    pub fn txn_to_json(txn: &BlockchainTxn) -> error::Result<serde_json::Value> {
         Ok(json!({ "txn": Self::txn_to_b64(txn)?}))
     }
 }

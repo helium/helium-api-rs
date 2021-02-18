@@ -1,5 +1,7 @@
+use crate::error;
 use rust_decimal::prelude::*;
 use rust_decimal::Decimal;
+use serde::Serialize;
 use std::str::FromStr;
 
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -8,7 +10,7 @@ pub struct Hst(Decimal);
 const HST_TO_BONES_SCALAR: i32 = 100_000_000;
 
 impl FromStr for Hst {
-    type Err = Box<dyn std::error::Error>;
+    type Err = error::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let data = Decimal::from_str(s)
@@ -16,11 +18,7 @@ impl FromStr for Hst {
             .unwrap();
 
         if data.scale() > 8 {
-            Err(format!(
-                "Too many decimals in input {}. Only 8 decimals permitted",
-                s
-            )
-            .into())
+            Err(error::decimals(s))
         } else {
             Ok(Hst(data))
         }
