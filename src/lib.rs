@@ -9,6 +9,7 @@ pub mod error;
 
 pub use helium_proto::*;
 // use serde::de::DeserializeOwned;
+use reqwest::Url;
 use std::time::Duration;
 
 /// The default timeout for API requests
@@ -88,6 +89,20 @@ pub struct Hotspot {
 }
 
 #[derive(Clone, Deserialize, Debug)]
+pub struct Reward {
+    /// The timestamp at which the award occurred.
+    pub timestamp: String,
+    /// The hotspot owner wallet address
+    pub hash: String,
+    /// The gateway address
+    pub gateway: String,
+    /// The block height when the reward was received.
+    pub block: u64,
+    /// The amount of the reward in bones.
+    pub amount: u64,
+}
+
+#[derive(Clone, Deserialize, Debug)]
 pub struct PendingTxnStatus {
     pub hash: String,
 }
@@ -114,6 +129,7 @@ pub struct Validator {
 #[derive(Clone, Deserialize, Debug)]
 pub(crate) struct Data<T> {
     pub data: T,
+    pub cursor: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -150,11 +166,25 @@ impl Client {
         Self { base_url, client }
     }
 
+    pub(crate) fn build_url(&self, path: &str, params: &[(&str, Option<&str>)]) -> reqwest::Url {
+        // Filter down optional parameters to just the set that were provided.
+        let params = params
+            .iter()
+            .filter(|p| p.1.is_some())
+            .map(|p| (p.0, p.1.unwrap()));
+
+        Url::parse_with_params(&format!("{}{}", self.base_url, path), params).unwrap()
+    }
+
     pub(crate) fn fetch<T: DeserializeOwned>(&self, path: &str) -> error::Result<T> {
         let request_url = format!("{}{}", self.base_url, path);
-        let response = self.client.get(&request_url).send()?.error_for_status()?;
+        Ok(self.fetch_data(&request_url)?.data)
+    }
+
+    pub(crate) fn fetch_data<T: DeserializeOwned>(&self, url: &str) -> error::Result<Data<T>> {
+        let response = self.client.get(url).send()?.error_for_status()?;
         let result: Data<T> = response.json()?;
-        Ok(result.data)
+        Ok(result)
     }
 
     pub(crate) fn post<T: Serialize + ?Sized, R: DeserializeOwned>(
@@ -197,6 +227,27 @@ impl Client {
     /// Get validator information for a given address
     pub fn get_validator(&self, address: &str) -> error::Result<Validator> {
         self.fetch::<Validator>(&format!("/validators/{}", address))
+    }
+
+    /// Get details for a given hotspot address
+    pub fn get_hotspot_rewards(
+        &self,
+        address: &str,
+        min_time: Option<&str>,
+        max_time: Option<&str>,
+        cursor: Option<&str>,
+    ) -> error::Result<(Vec<Reward>, Option<String>)> {
+        let request_url = self.build_url(
+            &format!("/hotspots/{}/rewards", address),
+            &[
+                ("min_time", min_time),
+                ("max_time", max_time),
+                ("cursor", cursor),
+            ],
+        );
+
+        let data = self.fetch_data(&request_url.to_string())?;
+        Ok((data.data, data.cursor))
     }
 
     /// Get the current active set of chain variables
