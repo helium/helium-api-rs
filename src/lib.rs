@@ -103,6 +103,21 @@ pub struct Reward {
 }
 
 #[derive(Clone, Deserialize, Debug)]
+pub struct OraclePrice {
+    /// The price submitted by the oracle in 1/100,000,000 USD.
+    pub price: u64,
+    /// The block height when the reward was received.
+    pub block: u64,
+}
+
+impl OraclePrice {
+    /// The price submitted by the oracle in USD.
+    pub fn to_usd(&self) -> f64 {
+        self.price as f64 / 100_000_000_f64
+    }
+}
+
+#[derive(Clone, Deserialize, Debug)]
 pub struct PendingTxnStatus {
     pub hash: String,
 }
@@ -248,6 +263,24 @@ impl Client {
 
         let data = self.fetch_data(&request_url.to_string())?;
         Ok((data.data, data.cursor))
+    }
+
+    pub fn get_oracle_prices_current(&self) -> error::Result<OraclePrice> {
+        self.fetch::<OraclePrice>("/oracle/prices/current")
+    }
+
+    pub fn get_oracle_prices(
+        &self,
+        cursor: Option<&str>,
+    ) -> error::Result<(Vec<OraclePrice>, Option<String>)> {
+        let request_url = self.build_url("/oracle/prices", &[("cursor", cursor)]);
+
+        let data = self.fetch_data(&request_url.to_string())?;
+        Ok((data.data, data.cursor))
+    }
+
+    pub fn get_oracle_prices_block(&self, block: u64) -> error::Result<OraclePrice> {
+        self.fetch::<OraclePrice>(&format!("/oracle/prices/{}", block))
     }
 
     /// Get the current active set of chain variables
