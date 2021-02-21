@@ -223,6 +223,11 @@ impl Client {
         self.fetch::<Account>(&format!("/accounts/{}", address))
     }
 
+    /// Get wallet information for the richest accounts
+    pub fn get_accounts_richest(&self, limit: Option<u32>) -> error::Result<Vec<Account>> {
+        self.fetch::<Vec<Account>>(&format!("/accounts/rich?limit={}", limit.unwrap_or(1000)))
+    }
+
     /// Get the current block height
     pub fn get_height(&self) -> error::Result<u64> {
         let result = self.fetch::<Height>("/blocks/height")?;
@@ -319,5 +324,103 @@ impl Client {
     /// be submitted to the api endpoint
     pub fn txn_to_json(txn: &BlockchainTxn) -> error::Result<serde_json::Value> {
         Ok(json!({ "txn": Self::txn_to_b64(txn)?}))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verify_blocks() {
+        let client = Client::default();
+
+        let r = client.get_height();
+        assert!(r.is_ok());
+        assert!(r.unwrap() > 0);
+    }
+
+    #[test]
+    fn verify_account_apis() {
+        let client = Client::default();
+
+        let richest = client.get_accounts_richest(Some(10)).unwrap();
+        assert_eq!(richest.len(), 10);
+
+        let test_addr = &richest[4].address;
+        let acct = client.get_account(test_addr).unwrap();
+        assert_eq!(&acct.address, test_addr, "address matches");
+    }
+
+    #[test]
+    fn verify_acount_hotspots() {
+        let client = Client::default();
+
+        // Mirrors address used at docs.helium.com
+        let test_addr = "13GCcF7oGb6waFBzYDMmydmXx4vNDUZGX4LE3QUh8eSBG53s5bx";
+
+        let hotspots = client.get_hotspots(&test_addr).unwrap();
+        assert!(hotspots.len() >= 1, "has hotspots");
+
+        let hotspot = client.get_hotspot(&hotspots[0].address).unwrap();
+        assert_eq!(hotspot.address, hotspots[0].address, "hotspots match");
+    }
+
+    #[test]
+    fn verify_hotspot_rewards() {
+        let client = Client::default();
+
+        // Mirrors address used at docs.helium.com
+        let test_hotspot = "11cxkqa2PjpJ9YgY9qK3Njn4uSFu6dyK9xV8XE4ahFSqN1YN2db";
+        let test_min_time = Some("2021-01-01");
+
+        let (_, c) = client
+            .get_hotspot_rewards(&test_hotspot, test_min_time, None, None)
+            .unwrap();
+        // rewards are often empty on first request.
+        assert!(c.is_some(), "has cursor");
+
+        let (r, _) = client
+            .get_hotspot_rewards(&test_hotspot, test_min_time, None, c.as_deref())
+            .unwrap();
+        assert!(r.len() > 0, "has rewards");
+    }
+
+    #[test]
+    fn verify_oracle_apis() {
+        let client = Client::default();
+
+        let cur = client.get_oracle_prices_current().unwrap();
+        assert!(cur.price > 0, "price is set");
+        assert!(cur.block > 0, "block is set");
+
+        let (p, c) = client.get_oracle_prices(None).unwrap();
+        assert!(p.len() > 0, "has prices");
+        assert!(c.is_some(), "has cursor");
+
+        let (p, c) = client.get_oracle_prices(c.as_deref()).unwrap();
+        assert!(p.len() > 0, "has prices");
+        assert!(c.is_some(), "has cursor");
+
+        let prev = client.get_oracle_prices_block(cur.block - 1).unwrap();
+        assert!(cur.price > 0, "price is set");
+        // API returns an earlier block's oracle price if the query block is not available.
+        assert!(prev.block < cur.block, "block matches expected");
+    }
+
+    #[test]
+    fn verify_vars() {
+        let client = Client::default();
+
+        let vars = client.get_vars().unwrap();
+        assert!(vars.len() > 0, "has variables");
+    }
+
+    #[test]
+    fn verify_oui() {
+        let client = Client::default();
+
+        let oui = client.get_last_oui().unwrap();
+        assert!(oui > 0, "has OUI")
     }
 }
