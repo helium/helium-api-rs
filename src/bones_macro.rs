@@ -29,7 +29,7 @@ macro_rules! decimal_bones {
                         return num;
                     }
                 }
-                panic!("Type has been constructed with invalid data")
+                panic!("$t has been constructed with invalid data")
             }
 
             pub fn from_bones(bones: u64) -> Self {
@@ -37,7 +37,7 @@ macro_rules! decimal_bones {
                     data.set_scale(8).unwrap();
                     return $t(data);
                 }
-                panic!("Value could not be parsed into Decimal")
+                panic!("Value could not be parsed into $t")
             }
 
             pub fn get_decimal(&self) -> Decimal {
@@ -57,7 +57,7 @@ macro_rules! decimal_bones {
                 if let Some(s) = opt {
                     Ok($t::from_bones(s))
                 } else {
-                    panic!("Unexpected user of Oracle Desrializer")
+                    panic!("Unexpected use of $t deserializer")
                 }
             }
         }
