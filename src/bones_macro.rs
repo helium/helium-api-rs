@@ -44,5 +44,22 @@ macro_rules! decimal_bones {
                 self.0
             }
         }
+
+        pub mod deserializer {
+            use super::$t;
+            use serde::{Deserialize, Deserializer};
+
+            pub fn deserialize<'de, D>(deserializer: D) -> Result<$t, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                let opt: Option<u64> = Option::deserialize(deserializer)?;
+                if let Some(s) = opt {
+                    Ok($t::from_bones(s))
+                } else {
+                    panic!("Unexpected user of Oracle Desrializer")
+                }
+            }
+        }
     };
 }

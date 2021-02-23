@@ -27,11 +27,13 @@ pub struct Account {
     /// the wallet.
     pub address: String,
     /// The latest balance of the wallet known to the API
-    pub balance: u64,
+    #[serde(with = "crate::hnt::deserializer")]
+    pub balance: Hnt,
     /// The data credit balance of the wallet known to the API
     pub dc_balance: u64,
     /// The security token balance of the wallet known to the API
-    pub sec_balance: u64,
+    #[serde(with = "crate::hst::deserializer")]
+    pub sec_balance: Hst,
     /// The current nonce for the account
     pub nonce: u64,
     /// The speculative nonce for the account
