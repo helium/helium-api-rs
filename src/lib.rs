@@ -1,14 +1,18 @@
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::json;
 
+#[macro_use]
+pub(crate) mod bones_macro;
+
 mod hnt;
 pub use hnt::Hnt;
 mod hst;
 pub use hst::Hst;
 pub mod error;
+mod oracle_price;
+pub use oracle_price::OraclePrice;
 
 pub use helium_proto::*;
-// use serde::de::DeserializeOwned;
 use std::time::Duration;
 
 /// The default timeout for API requests
@@ -16,7 +20,7 @@ pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
 pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug)]
 /// Represents a wallet on the blockchain.
 pub struct Account {
     /// The wallet address is the base58 check-encoded public key of
@@ -122,6 +126,13 @@ pub struct Client {
     client: reqwest::blocking::Client,
 }
 
+#[derive(Clone, Deserialize, Debug)]
+pub struct OraclePredictions {
+    #[serde(with = "crate::oracle_price::deserializer")]
+    price: OraclePrice,
+    time: usize,
+}
+
 impl Default for Client {
     /// Create a new client using the hosted Helium API at
     /// explorer.helium.foundation
@@ -213,6 +224,22 @@ impl Client {
         let result = self.fetch::<serde_json::Value>("/ouis/last")?;
         let oui = result["oui"].clone();
         oui.as_u64().ok_or_else(|| error::value(oui))
+    }
+
+    /// Get current oracle price
+    pub fn get_oracle_price_current(&self) -> error::Result<OraclePrice> {
+        #[derive(Clone, Deserialize, Debug)]
+        struct Response {
+            price: u64,
+        }
+        let response = self.fetch::<Response>("/oracle/prices/current")?;
+        Ok(OraclePrice::from_bones(response.price))
+    }
+
+    /// Get current oracle price
+    pub fn get_oracle_price_predicted(&self) -> error::Result<Vec<OraclePredictions>> {
+        let response = self.fetch::<Vec<OraclePredictions>>("/oracle/predictions")?;
+        Ok(response)
     }
 
     /// Convert a given transaction to json, ready to be submitted
