@@ -92,6 +92,30 @@ pub struct PendingTxnStatus {
     pub hash: String,
 }
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
+/// Represents a validator on the blockchain.
+pub struct Validator {
+    /// The validator address is the base58 check-encoded public key of
+    /// the validator.
+    pub address: String,
+    /// The validator pwner is the base58 check-encoded public key of
+    /// the owner of the validator.
+    pub owner: String,
+    /// The staked amount for the validator
+    pub stake: u64,
+    /// The current nonce for the validator
+    pub nonce: u64,
+    /// The speculative nonce for the validator
+    #[serde(default)]
+    pub speculative_nonce: u64,
+    /// The last heartbeat transaction of the validator
+    pub last_heartbeat: u64,
+    /// The last heartbeat version of the validator heartbeat
+    pub version_heartbeat: u64,
+    /// The current status of the validator (staked, cooldown, unstaked)
+    pub status: String,
+}
+
 #[derive(Clone, Deserialize, Debug)]
 pub(crate) struct Data<T> {
     pub data: T,
@@ -173,6 +197,11 @@ impl Client {
     /// Get details for a given hotspot address
     pub fn get_hotspot(&self, address: &str) -> error::Result<Hotspot> {
         self.fetch::<Hotspot>(&format!("/hotspots/{}", address))
+    }
+
+    /// Get validator information for a given address
+    pub fn get_validator(&self, address: &str) -> error::Result<Validator> {
+        self.fetch::<Validator>(&format!("/validators/{}", address))
     }
 
     /// Get the current active set of chain variables
