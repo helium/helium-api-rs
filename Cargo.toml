@@ -1,6 +1,6 @@
 [package]
 name = "helium-api"
-version = "1.1.8-dev"
+version = "1.1.8-rc.1"
 authors = ["Marc Nijdam <marc@helium.com>"]
 edition = "2018"
 
