@@ -103,11 +103,6 @@ pub struct Validator {
     pub owner: String,
     /// The staked amount for the validator
     pub stake: u64,
-    /// The current nonce for the validator
-    pub nonce: u64,
-    /// The speculative nonce for the validator
-    #[serde(default)]
-    pub speculative_nonce: u64,
     /// The last heartbeat transaction of the validator
     pub last_heartbeat: u64,
     /// The last heartbeat version of the validator heartbeat
