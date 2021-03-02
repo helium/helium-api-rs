@@ -1,5 +1,7 @@
+use serde::Serialize;
+
 const HST_TO_BONES_SCALAR: i32 = 100_000_000;
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct Hst(Decimal);
 
 decimal_bones!(Hst, HST_TO_BONES_SCALAR);

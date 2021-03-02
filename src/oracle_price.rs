@@ -1,7 +1,7 @@
-use super::decimal_bones;
+use serde::Serialize;
 
 const ORACLE_PRICE_TO_BONES_SCALAR: i32 = 100_000_000;
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct OraclePrice(Decimal);
 
 decimal_bones!(OraclePrice, ORACLE_PRICE_TO_BONES_SCALAR);
