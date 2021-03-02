@@ -44,5 +44,11 @@ macro_rules! decimal_bones {
                 self.0
             }
         }
+
+        impl ToString for $t {
+            fn to_string(&self) -> String {
+                self.0.to_string()
+            }
+        }
     };
 }
