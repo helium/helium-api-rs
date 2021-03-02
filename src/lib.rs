@@ -129,8 +129,8 @@ pub struct Client {
 #[derive(Clone, Deserialize, Debug)]
 pub struct OraclePredictions {
     #[serde(with = "crate::oracle_price::deserializer")]
-    price: OraclePrice,
-    time: usize,
+    pub price: OraclePrice,
+    pub time: usize,
 }
 
 impl Default for Client {
