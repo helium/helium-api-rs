@@ -20,7 +20,7 @@ pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
 pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
 
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug, Serialize)]
 /// Represents a wallet on the blockchain.
 pub struct Account {
     /// The wallet address is the base58 check-encoded public key of
@@ -42,7 +42,7 @@ pub struct Account {
     pub speculative_sec_nonce: u64,
 }
 
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug, Serialize)]
 pub struct Geocode {
     /// The long version of city for the last asserted location
     pub long_city: Option<String>,
