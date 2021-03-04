@@ -1,9 +1,9 @@
-use helium_api::Client;
+use helium_api::{blocks, Client};
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::default();
-    match client.get_height() {
-        Ok(height) => println!("Block Height: {}", height),
-        Err(e) => println!("Error fetching block height: {:?}", e),
-    }
+    let height = blocks::height(&client).await?;
+    println!("Block Height: {}", height);
+    Ok(())
 }

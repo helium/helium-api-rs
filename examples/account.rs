@@ -1,7 +1,13 @@
-use helium_api::Client;
+use helium_api::{accounts, Client};
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::default();
-    let account = client.get_account("13buBykFQf5VaQtv7mWj2PBY9Lq4i1DeXhg7C4Vbu3ppzqqNkTH");
+    let account = accounts::get(
+        &client,
+        "13buBykFQf5VaQtv7mWj2PBY9Lq4i1DeXhg7C4Vbu3ppzqqNkTH",
+    )
+    .await?;
     println!("Account: {:?}", account);
+    Ok(())
 }
