@@ -1,10 +1,11 @@
 [package]
 name = "helium-api"
 version = "1.1.8-rc.2"
+license = "Apache-2.0"
+repository = "https://github.com/helium/helium-api-rs"
+description = "An async library for the Helium blockchain REST API"
 authors = ["Marc Nijdam <marc@helium.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 reqwest = {version = "~0.11", features = ["gzip", "json"]}
