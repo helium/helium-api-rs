@@ -5,8 +5,6 @@ pub type Result<T = ()> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("request error")]
     Request(#[from] reqwest::Error),
-    #[error("encode error")]
-    Encode(#[from] prost::EncodeError),
     #[error("unexpected value")]
     Value(serde_json::Value),
     #[error("invalid decimals in {0}, only 8 allowed")]

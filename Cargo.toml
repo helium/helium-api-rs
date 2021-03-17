@@ -14,7 +14,6 @@ serde_json = "1"
 base64 = "0"
 rust_decimal = {version = "1", features = ["serde-float"] }
 thiserror = "1"
-prost = "*"
 futures = "0"
 async-trait = "0"
 
