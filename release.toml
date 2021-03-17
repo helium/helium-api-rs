@@ -1,3 +1,2 @@
 sign-commit = true
 dev-version-ext = "dev"
-disable-publish = true
