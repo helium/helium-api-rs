@@ -3,6 +3,7 @@ name = "helium-api"
 version = "2.0.1-dev"
 license = "Apache-2.0"
 repository = "https://github.com/helium/helium-api-rs"
+readme = "README.md"
 description = "An async library for the Helium blockchain REST API"
 authors = ["Marc Nijdam <marc@helium.com>"]
 edition = "2018"
