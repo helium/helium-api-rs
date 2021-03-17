@@ -4,11 +4,14 @@ An async library to access the public [Helium](https://helium.com) blockchain RE
 
 [![Crates.io][crates-badge]][crates-url]
 [![Build Status][actions-badge]][actions-url]
+[![Discord chat][discord-badge]][discord-url]
 
 [crates-badge]: https://img.shields.io/crates/v/helium-api.svg
 [crates-url]: https://crates.io/crates/helium-api
 [actions-badge]: https://github.com/helium/helium-api-rs/workflows/Continuous%20Integration/badge.svg
 [actions-url]: https://github.com/helium/helium-api-rs/actions?query=workflow%3AContinuous%20Integration+branch%3Amaster
+[discord-badge]: https://img.shields.io/discord/500028886025895936.svg?logo=discord&style=flat-square
+[discord-url]: https://discord.gg/helium
 
 ## Overview
 
