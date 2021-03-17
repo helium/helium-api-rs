@@ -1,0 +1,73 @@
+use crate::*;
+use core::fmt;
+use rust_decimal::prelude::*;
+use serde::{de::Deserializer, Deserialize, Serialize};
+use std::str::FromStr;
+
+macro_rules! decimal_scalar {
+    ($stype:ident, $scalar:literal) => {
+        #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+        pub struct $stype(Decimal);
+
+        impl FromStr for $stype {
+            type Err = Error;
+
+            fn from_str(s: &str) -> Result<Self> {
+                match Decimal::from_str(s).or_else(|_| Decimal::from_scientific(s)) {
+                    Ok(data) if data.scale() > 8 => Err(Error::decimals(s)),
+                    Ok(data) => Ok(Self(data)),
+                    Err(_) => Err(Error::decimals(s)),
+                }
+            }
+        }
+
+        impl fmt::Display for $stype {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                self.0.fmt(f)
+            }
+        }
+
+        impl $stype {
+            pub fn new(d: Decimal) -> Self {
+                Self(d)
+            }
+
+            pub fn get_decimal(&self) -> Decimal {
+                self.0
+            }
+
+            pub fn deserialize<'de, D>(d: D) -> std::result::Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                let val = u64::deserialize(d)?;
+                Ok(Self::from(val))
+            }
+        }
+
+        impl From<u64> for $stype {
+            fn from(v: u64) -> Self {
+                if let Some(mut data) = Decimal::from_u64(v) {
+                    data.set_scale(8).unwrap();
+                    return Self(data);
+                }
+                panic!("u64 could not be converted into Decimal")
+            }
+        }
+
+        impl From<$stype> for u64 {
+            fn from(v: $stype) -> Self {
+                if let Some(scaled_dec) = v.0.checked_mul($scalar.into()) {
+                    if let Some(num) = scaled_dec.to_u64() {
+                        return num;
+                    }
+                }
+                panic!("Invalid scaled decimal construction")
+            }
+        }
+    };
+}
+
+decimal_scalar!(Hnt, 100_000_000);
+decimal_scalar!(Hst, 100_000_000);
+decimal_scalar!(Usd, 100_000_000);

@@ -11,12 +11,20 @@ pub enum Error {
     Value(serde_json::Value),
     #[error("invalid decimals in {0}, only 8 allowed")]
     Decimals(String),
+    #[error("unexpected or invalid number {0}")]
+    Number(String),
 }
 
-pub fn value(value: serde_json::Value) -> Error {
-    Error::Value(value)
-}
+impl Error {
+    pub fn value(value: serde_json::Value) -> Self {
+        Self::Value(value)
+    }
 
-pub fn decimals(value: &str) -> Error {
-    Error::Decimals(value.to_string())
+    pub fn decimals(value: &str) -> Self {
+        Self::Decimals(value.to_string())
+    }
+
+    pub fn number(value: &str) -> Self {
+        Self::Number(value.to_string())
+    }
 }
