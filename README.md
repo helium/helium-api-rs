@@ -11,8 +11,8 @@ An async library to access the public [Helium](https://helium.com) blockchain RE
 [crates-url]: https://crates.io/crates/helium-api
 [docs-badge]: https://docs.rs/helium-api/badge.svg
 [docs-url]: https://docs.rs/helium-api/latest/helium_api/
-[actions-badge]: https://github.com/helium/helium-api-rs/workflows/Continuous%20Integration/badge.svg
-[actions-url]: https://github.com/helium/helium-api-rs/actions?query=workflow%3AContinuous%20Integration+branch%3Amaster
+[actions-badge]: https://github.com/helium/helium-api-rs/workflows/CI/badge.svg
+[actions-url]: https://github.com/helium/helium-api-rs/actions?query=workflow%3ACI+branch%3Amaster
 [discord-badge]: https://img.shields.io/discord/500028886025895936.svg?logo=discord&style=flat-square
 [discord-url]: https://discord.gg/helium
 
