@@ -42,6 +42,8 @@ pub struct Hotspot {
     pub location: Option<String>, // h3
     /// The geocode information for the hotspot location
     pub geocode: Geocode,
+    /// The current nonce for the hotspot
+    pub nonce: u64,
 }
 
 /// Get all known hotspots
