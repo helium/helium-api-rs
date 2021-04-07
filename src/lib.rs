@@ -15,7 +15,7 @@ mod error;
 mod values;
 
 pub use error::{Error, Result};
-pub use values::{Hnt, Hst, Usd};
+pub use values::{Dbi, Hnt, Hst, Usd};
 pub mod accounts;
 pub mod blocks;
 pub mod hotspots;

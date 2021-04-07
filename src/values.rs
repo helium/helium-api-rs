@@ -5,7 +5,7 @@ use serde::{de::Deserializer, Deserialize, Serialize};
 use std::str::FromStr;
 
 macro_rules! decimal_scalar {
-    ($stype:ident, $scalar:literal) => {
+    ($stype:ident, $scalar:literal, $scale:literal) => {
         #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
         pub struct $stype(Decimal);
 
@@ -48,7 +48,7 @@ macro_rules! decimal_scalar {
         impl From<u64> for $stype {
             fn from(v: u64) -> Self {
                 if let Some(mut data) = Decimal::from_u64(v) {
-                    data.set_scale(8).unwrap();
+                    data.set_scale($scale).unwrap();
                     return Self(data);
                 }
                 panic!("u64 could not be converted into Decimal")
@@ -65,9 +65,31 @@ macro_rules! decimal_scalar {
                 panic!("Invalid scaled decimal construction")
             }
         }
+
+        impl From<i32> for $stype {
+            fn from(v: i32) -> Self {
+                if let Some(mut data) = Decimal::from_i32(v) {
+                    data.set_scale($scale).unwrap();
+                    return Self(data);
+                }
+                panic!("u64 could not be converted into Decimal")
+            }
+        }
+
+        impl From<$stype> for i32 {
+            fn from(v: $stype) -> Self {
+                if let Some(scaled_dec) = v.0.checked_mul($scalar.into()) {
+                    if let Some(num) = scaled_dec.to_i32() {
+                        return num;
+                    }
+                }
+                panic!("Invalid scaled decimal construction")
+            }
+        }
     };
 }
 
-decimal_scalar!(Hnt, 100_000_000);
-decimal_scalar!(Hst, 100_000_000);
-decimal_scalar!(Usd, 100_000_000);
+decimal_scalar!(Hnt, 100_000_000, 8);
+decimal_scalar!(Hst, 100_000_000, 8);
+decimal_scalar!(Usd, 100_000_000, 8);
+decimal_scalar!(Dbi, 10, 1);
