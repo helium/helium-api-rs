@@ -39,7 +39,11 @@ pub struct Hotspot {
     pub lng: Option<f64>,
     /// The h3 index based on the lat/lon of the hotspot is used for
     /// PoC challenges.
-    pub location: Option<String>, // h3
+    pub location: Option<String>,
+    /// The elevation (in meters) above or belowo sea level
+    pub elevation: Option<i32>,
+    /// The gain (in dbi) above or belowo sea level
+    pub gain: Option<Dbi>,
     /// The geocode information for the hotspot location
     pub geocode: Geocode,
     /// The current nonce for the hotspot
