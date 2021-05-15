@@ -48,6 +48,9 @@ pub struct Hotspot {
     pub geocode: Geocode,
     /// The current nonce for the hotspot
     pub nonce: u64,
+    /// The speculative nonce for the hotspot. This field is only meaningful
+    /// when a single hotspot is requested
+    pub speculative_nonce: Option<u64>,
 }
 
 /// Get all known hotspots
