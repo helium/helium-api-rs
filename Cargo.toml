@@ -1,6 +1,6 @@
 [package]
 name = "helium-api"
-version = "2.0.6"
+version = "2.0.7-dev"
 license = "Apache-2.0"
 repository = "https://github.com/helium/helium-api-rs"
 readme = "README.md"
