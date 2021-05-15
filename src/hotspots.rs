@@ -50,7 +50,8 @@ pub struct Hotspot {
     pub nonce: u64,
     /// The speculative nonce for the hotspot. This field is only meaningful
     /// when a single hotspot is requested
-    pub speculative_nonce: Option<u64>,
+    #[serde(default)]
+    pub speculative_nonce: u64,
 }
 
 /// Get all known hotspots
