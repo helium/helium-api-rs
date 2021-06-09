@@ -151,6 +151,7 @@ pub struct Reward {
     /// the owner's wallet address.
     pub account: String,
     /// The reward amount.
+    #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount: Hnt,
     /// The block the reward was earned in.
     pub block: i64,
