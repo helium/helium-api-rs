@@ -49,7 +49,7 @@ pub struct Reward {
     /// the owner's wallet address.
     pub account: String,
     /// The reward amount.
-    pub amount: i64,
+    pub amount: Hnt,
     /// The block the reward was earned in.
     pub block: i64,
     /// The validator address is the base58 check-encoded public key of
