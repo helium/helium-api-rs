@@ -1,11 +1,5 @@
 use crate::*;
-use serde::Deserialize;
 use serde_json::json;
-
-#[derive(Clone, Deserialize, Debug)]
-pub struct PendingTxnStatus {
-    pub hash: String,
-}
 
 /// Convert a given transaction to json, ready to be submitted
 /// Submit a transaction to the blockchain

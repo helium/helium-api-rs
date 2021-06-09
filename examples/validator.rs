@@ -1,7 +1,7 @@
 use futures::stream::StreamExt;
 use helium_api::{
-    validators::{self, QueryTimeRange, Validator},
-    Client,
+    models::{QueryTimeRange, Validator},
+    validators, Client,
 };
 
 #[tokio::main]

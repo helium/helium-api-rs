@@ -1,29 +1,4 @@
 use crate::*;
-use serde::{Deserialize, Serialize};
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-/// Represents a wallet on the blockchain.
-pub struct Account {
-    /// The wallet address is the base58 check-encoded public key of
-    /// the wallet.
-    pub address: String,
-    /// The latest balance of the wallet known to the API
-    #[serde(deserialize_with = "Hnt::deserialize")]
-    pub balance: Hnt,
-    /// The data credit balance of the wallet known to the API
-    pub dc_balance: u64,
-    /// The security token balance of the wallet known to the API
-    #[serde(deserialize_with = "Hst::deserialize")]
-    pub sec_balance: Hst,
-    /// The current nonce for the account
-    pub nonce: u64,
-    /// The speculative nonce for the account
-    #[serde(default)]
-    pub speculative_nonce: u64,
-    /// The speculative security nonce for the account
-    #[serde(default)]
-    pub speculative_sec_nonce: u64,
-}
 
 /// Get all known accounts
 pub fn all(client: &Client) -> Stream<Account> {
@@ -38,17 +13,17 @@ pub async fn get(client: &Client, address: &str) -> Result<Account> {
 }
 
 /// Get all hotspots owned by a given account
-pub fn hotspots(client: &Client, address: &str) -> Stream<hotspots::Hotspot> {
+pub fn hotspots(client: &Client, address: &str) -> Stream<Hotspot> {
     client.fetch_stream(&format!("/accounts/{}/hotspots", address), NO_QUERY)
 }
 
 /// Get all OUIs owned by a given account
-pub fn ouis(client: &Client, address: &str) -> Stream<ouis::Oui> {
+pub fn ouis(client: &Client, address: &str) -> Stream<Oui> {
     client.fetch_stream(&format!("/accounts/{}/ouis", address), NO_QUERY)
 }
 
 /// Get all validators owned by a given account
-pub fn validators(client: &Client, address: &str) -> Stream<validators::Validator> {
+pub fn validators(client: &Client, address: &str) -> Stream<Validator> {
     client.fetch_stream(&format!("/accounts/{}/validators", address), NO_QUERY)
 }
 
