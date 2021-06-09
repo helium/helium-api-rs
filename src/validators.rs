@@ -90,8 +90,9 @@ pub async fn stats(client: &Client) -> Result<Stats> {
 /// Get rewards for a validator
 ///
 /// Returns rewards for a given validator per reward block the validator is in,
-/// for a given timeframe. `QueryTimeRange` contains the timestamps given in ISO 8601 format, or in relative
-/// time. The block that contains the max_time timestamp is excluded from the result.
+/// for a given timeframe. `QueryTimeRange` contains the timestamps given in 
+/// 4ISO 8601 format, or in relative time. The block that contains the max_time
+/// timestamp is excluded from the result.
 pub async fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Reward> {
     client.fetch_stream(&format!("/validators/{}/rewards", address), query)
 }
