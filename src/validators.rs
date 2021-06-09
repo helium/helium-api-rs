@@ -87,7 +87,7 @@ pub async fn stats(client: &Client) -> Result<Stats> {
     client.fetch("/validators/stats", NO_QUERY).await
 }
 
-/// Get reward total for a validator
+/// Get rewards for a validator
 ///
 /// Returns rewards for a given validator per reward block the validator is in,
 /// for a given timeframe. `QueryTimeRange` contains the timestamps given in ISO 8601 format, or in relative
