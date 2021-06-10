@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{models::Hotspot, *};
 
 /// Get all known hotspots
 pub fn all(client: &Client) -> Stream<Hotspot> {

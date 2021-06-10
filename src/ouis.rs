@@ -1,4 +1,7 @@
-use crate::*;
+use crate::{
+    models::{Oui, OuiStats},
+    *,
+};
 
 /// Get a stream of all ouis
 pub fn all(client: &Client) -> Stream<Oui> {

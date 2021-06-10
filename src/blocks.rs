@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{models::Height, *};
 
 /// Get the current height of the blockchain
 pub async fn height(client: &Client) -> Result<u64> {

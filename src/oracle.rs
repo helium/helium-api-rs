@@ -1,4 +1,7 @@
-use crate::*;
+use crate::{
+    models::{OraclePrediction, OraclePrice},
+    *,
+};
 
 pub mod prices {
     use super::*;
