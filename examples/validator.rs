@@ -1,8 +1,5 @@
 use futures::stream::StreamExt;
-use helium_api::{
-    models::{QueryTimeRange, Validator},
-    validators, Client,
-};
+use helium_api::{models::QueryTimeRange, validators, Client, IntoVec};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -13,7 +10,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Stats {:?}", stats);
 
     // Get all Validators
-    let validators = get_all_validators(&client).await;
+    let validators = validators::all(&client).into_vec().await?;
     println!("Fetched {} validators.", validators.len());
 
     // Get Rewards
@@ -32,18 +29,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     Ok(())
-}
-
-async fn get_all_validators(client: &Client) -> Vec<Validator> {
-    let mut stream = validators::all(&client);
-    let mut validators: Vec<Validator> = Vec::new();
-
-    while let Some(v) = stream.next().await {
-        match v {
-            Ok(v) => validators.push(v),
-            Err(e) => println!("Error trying to get helium validators: {}", e),
-        }
-    }
-
-    validators
 }
