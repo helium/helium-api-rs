@@ -1,4 +1,7 @@
-use crate::*;
+use crate::{
+    models::{QueryTimeRange, Reward, Validator, ValidatorStats},
+    *,
+};
 
 /// Get all known validators
 pub fn all(client: &Client) -> Stream<Validator> {
