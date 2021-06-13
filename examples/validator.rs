@@ -1,4 +1,3 @@
-use futures::stream::StreamExt;
 use helium_api::{models::QueryTimeRange, validators, Client, IntoVec};
 
 #[tokio::main]
