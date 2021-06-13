@@ -19,13 +19,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             min_time: "-30 day".into(),
             max_time: "-1 hour".into(),
         };
-        let mut stream = validators::rewards(&client, &v.address, &params).await;
-        while let Some(r) = stream.next().await {
-            match r {
-                Ok(r) => println!("{:?}", r),
-                Err(e) => println!("Error trying to get helium rewards: {}", e),
-            }
-        }
+        let rewards = validators::rewards(&client, &v.address, &params).into_vec().await;
+        rewards.iter().for_each(|r| println!("{:?}", r));
     };
 
     Ok(())
