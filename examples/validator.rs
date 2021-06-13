@@ -19,7 +19,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             min_time: "-30 day".into(),
             max_time: "-1 hour".into(),
         };
-        let rewards = validators::rewards(&client, &v.address, &params).into_vec().await;
+        let rewards = validators::rewards(&client, &v.address, &params)
+            .into_vec()
+            .await;
         rewards.iter().for_each(|r| println!("{:?}", r));
     };
 
