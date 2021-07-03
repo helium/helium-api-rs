@@ -144,7 +144,7 @@ pub struct QueryTimeRange {
     pub max_time: String,
 }
 
-/// Reward for validator
+/// Reward for validator or hotspot
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Reward {
     /// The owner address is the base58 check-encoded public key of
@@ -155,8 +155,8 @@ pub struct Reward {
     pub amount: Hnt,
     /// The block the reward was earned in.
     pub block: i64,
-    /// The validator address is the base58 check-encoded public key of
-    /// the validator.
+    /// The address is the base58 check-encoded public key of the
+    /// validator or hotspot.
     pub gateway: String,
     /// The transaction hash of the reward.
     pub hash: String,

@@ -1,4 +1,4 @@
-use crate::{models::Hotspot, *};
+use crate::{models::Hotspot, models::QueryTimeRange, models::Reward, *};
 
 /// Get all known hotspots
 pub fn all(client: &Client) -> Stream<Hotspot> {
@@ -10,6 +10,11 @@ pub async fn get(client: &Client, address: &str) -> Result<Hotspot> {
     client
         .fetch(&format!("/hotspots/{}", address), NO_QUERY)
         .await
+}
+
+/// Get rewards for a specific hotspot by its address
+pub fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Reward> {
+    client.fetch_stream(&format!("/hotspots/{}/rewards", address), query)
 }
 
 #[cfg(test)]
@@ -43,5 +48,24 @@ mod test {
             hotspot.address,
             "112vvSrNAwJRSmR54aqFLEhbr6cy6T4Ufuja4VWVrxvkUAUxL2yG"
         );
+    }
+
+    #[test]
+    async fn rewards() {
+        let client = Client::default();
+        let params = QueryTimeRange {
+            min_time: "2021-06-01".into(),
+            max_time: "2021-06-05".into(),
+        };
+        let rewards = hotspots::rewards(
+            &client,
+            "112vvSrNAwJRSmR54aqFLEhbr6cy6T4Ufuja4VWVrxvkUAUxL2yG",
+            &params,
+        )
+        .into_vec()
+        .await
+        .expect("rewards");
+        println!("{:?}", rewards);
+        assert_eq!(rewards.len(), 21);
     }
 }
