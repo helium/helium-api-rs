@@ -1,5 +1,6 @@
 use crate::values::{Dbi, Hnt, Hst, Usd};
 use chrono::{DateTime, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -162,6 +163,25 @@ pub struct Reward {
     pub hash: String,
     /// The timestamp of the rewards.
     pub timestamp: DateTime<Utc>,
+}
+
+/// RewardSum captures the sum of rewards in a given time span.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RewardSum {
+    /// The sum of all reward amounts.
+    pub sum: Hnt,
+    /// Average rewards in the bucket.
+    pub avg: Decimal,
+    /// Maxmimum rewards in the bucket.
+    pub max: Decimal,
+    /// Median rewards in the bucket.
+    pub median: Decimal,
+    /// Minimum rewards in the bucket.
+    pub min: Decimal,
+    /// Standard deviation of rewards in the bucket.
+    pub stddev: Decimal,
+    /// Total rewards in the bucket.
+    pub total: Decimal,
 }
 
 /// Stats for a specific validator stake status
