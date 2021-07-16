@@ -188,6 +188,27 @@ impl fmt::Display for Subnet {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+/// The Penalty types reported for a validator.
+pub enum PenaltyType {
+    Performance,
+    Tenure,
+    Dkg,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+/// Represents a penalty for a validator.
+pub struct Penalty {
+    /// The type of penalty
+    #[serde(rename = "type")]
+    kind: PenaltyType,
+    /// The block the penalty occured in.
+    height: u64,
+    /// The amount of penalty.
+    amount: f64,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents a validator on the blockchain.
 pub struct Validator {
     /// The validator address is the base58 check-encoded public key of
@@ -205,6 +226,14 @@ pub struct Validator {
     pub version_heartbeat: u64,
     /// The current status of the validator (staked, cooldown, unstaked)
     pub stake_status: String,
+    /// The total penalty of the validator
+    pub penalty: f64,
+    /// A list of penalties this validator has received
+    pub penalties: Vec<Penalty>,
+    /// The block this validator was added to chain
+    pub block_added: u64,
+    /// The current block this validator is synced to
+    pub block: u64,
 }
 
 /// Stats for validators
