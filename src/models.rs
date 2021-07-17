@@ -201,11 +201,11 @@ pub enum PenaltyType {
 pub struct Penalty {
     /// The type of penalty
     #[serde(rename = "type")]
-    kind: PenaltyType,
+    pub kind: PenaltyType,
     /// The block the penalty occured in.
-    height: u64,
+    pub height: u64,
     /// The amount of penalty.
-    amount: f64,
+    pub amount: f64,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
