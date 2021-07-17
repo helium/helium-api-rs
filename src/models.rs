@@ -1,5 +1,6 @@
 use crate::values::{Dbi, Hnt, Hst, Usd};
 use chrono::{DateTime, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -144,7 +145,7 @@ pub struct QueryTimeRange {
     pub max_time: String,
 }
 
-/// Reward for validator
+/// Reward for validator or hotspot
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Reward {
     /// The owner address is the base58 check-encoded public key of
@@ -155,13 +156,32 @@ pub struct Reward {
     pub amount: Hnt,
     /// The block the reward was earned in.
     pub block: i64,
-    /// The validator address is the base58 check-encoded public key of
-    /// the validator.
+    /// The address is the base58 check-encoded public key of the
+    /// validator or hotspot.
     pub gateway: String,
     /// The transaction hash of the reward.
     pub hash: String,
     /// The timestamp of the rewards.
     pub timestamp: DateTime<Utc>,
+}
+
+/// RewardSum captures the sum of rewards in a given time span.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RewardSum {
+    /// The sum of all reward amounts.
+    pub sum: Hnt,
+    /// Average rewards in the bucket.
+    pub avg: Decimal,
+    /// Maxmimum rewards in the bucket.
+    pub max: Decimal,
+    /// Median rewards in the bucket.
+    pub median: Decimal,
+    /// Minimum rewards in the bucket.
+    pub min: Decimal,
+    /// Standard deviation of rewards in the bucket.
+    pub stddev: Decimal,
+    /// Total rewards in the bucket.
+    pub total: Decimal,
 }
 
 /// Stats for a specific validator stake status
