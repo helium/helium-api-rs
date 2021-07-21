@@ -1,7 +1,10 @@
-use crate::values::{Dbi, Hnt, Hst, Usd};
+use crate::{
+    values::{Dbi, Hnt, Hst, Usd},
+    Error, Result,
+};
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::fmt;
+use serde::{de, Deserialize, Serialize};
+use std::{fmt, str::FromStr};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents a wallet on the blockchain.
@@ -72,6 +75,8 @@ pub struct Hotspot {
     /// The h3 index based on the lat/lon of the hotspot is used for
     /// PoC challenges.
     pub location: Option<String>,
+    /// The mode in which the hotspots was added to the network.
+    pub mode: HotspotStakingMode,
     /// The elevation (in meters) above or belowo sea level
     pub elevation: Option<i32>,
     /// The gain (in dbi) above or belowo sea level
@@ -84,6 +89,64 @@ pub struct Hotspot {
     /// when a single hotspot is requested
     #[serde(default)]
     pub speculative_nonce: u64,
+}
+
+#[derive(Clone, Serialize, Debug)]
+pub enum HotspotStakingMode {
+    Full,
+    Light,
+    DataOnly,
+}
+
+impl fmt::Display for HotspotStakingMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::DataOnly => f.write_str("dataonly"),
+            Self::Full => f.write_str("full"),
+            Self::Light => f.write_str("light"),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for HotspotStakingMode {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        struct HotspotStakingModeVisitor;
+
+        impl<'de> de::Visitor<'de> for HotspotStakingModeVisitor {
+            type Value = HotspotStakingMode;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("full, light, dataonly")
+            }
+
+            fn visit_str<E>(self, value: &str) -> std::result::Result<HotspotStakingMode, E>
+            where
+                E: de::Error,
+            {
+                match HotspotStakingMode::from_str(value) {
+                    Ok(v) => Ok(v),
+                    Err(_) => Err(de::Error::custom("invalid staking mode")),
+                }
+            }
+        }
+
+        deserializer.deserialize_str(HotspotStakingModeVisitor)
+    }
+}
+impl FromStr for HotspotStakingMode {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s.to_lowercase().as_ref() {
+            "light" => Ok(Self::Light),
+            "full" => Ok(Self::Full),
+            "dataonly" => Ok(Self::DataOnly),
+            _ => Err(Error::value(s.into())),
+        }
+    }
 }
 
 /// An oracle prediction is inferred from the current oracle price and submitted
