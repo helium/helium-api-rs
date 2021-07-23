@@ -80,6 +80,7 @@ pub struct Hotspot {
     /// The elevation (in meters) above or belowo sea level
     pub elevation: Option<i32>,
     /// The gain (in dbi) above or belowo sea level
+    #[serde(deserialize_with = "Dbi::deserialize_option")]
     pub gain: Option<Dbi>,
     /// The geocode information for the hotspot location
     pub geocode: Geocode,
