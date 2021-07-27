@@ -43,6 +43,18 @@ macro_rules! decimal_scalar {
                 let val = u64::deserialize(d)?;
                 Ok(Self::from(val))
             }
+
+            pub fn deserialize_option<'de, D>(d: D) -> std::result::Result<Option<Self>, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                let v: Option<u64> = Option::deserialize(d)?;
+                if let Some(val) = v {
+                    Ok(Some(Self::from(val)))
+                } else {
+                    Ok(None)
+                }
+            }
         }
 
         impl From<u64> for $stype {

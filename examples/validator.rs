@@ -18,10 +18,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             min_time: "-30 day".into(),
             max_time: "-1 hour".into(),
         };
+        println!("Validator: {:?}", v);
         let rewards = validators::rewards(&client, &v.address, &params)
             .into_vec()
-            .await;
-        rewards.iter().for_each(|r| println!("{:?}", r));
+            .await?;
+        println!("Last 10 rewards:");
+        rewards
+            .iter()
+            .take(10)
+            .for_each(|r| println!("Block: {}: {} HNT", r.block, r.amount.to_string()));
     };
 
     Ok(())
