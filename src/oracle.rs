@@ -33,6 +33,7 @@ pub async fn predictions(client: &Client) -> Result<Vec<OraclePrediction>> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use models::Usd;
     use tokio::test;
 
     #[test]

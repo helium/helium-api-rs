@@ -12,10 +12,8 @@ pub type Future<T> = Pin<Box<dyn StdFuture<Output = Result<T>> + Send>>;
 pub type Stream<T> = Pin<Box<dyn StdStream<Item = Result<T>> + Send>>;
 
 mod error;
-mod values;
 
 pub use error::{Error, Result};
-pub use values::{Dbi, Hnt, Hst, Usd};
 
 pub mod accounts;
 pub mod blocks;
