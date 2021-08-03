@@ -16,7 +16,7 @@ pub use geocode::*;
 pub use hotspot::*;
 pub use oracle::*;
 pub use oui::*;
-pub use transaction::*;
+pub use transaction::{PendingTxnStatus, Transaction};
 pub use validator::*;
 pub use values::*;
 
