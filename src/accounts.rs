@@ -1,5 +1,5 @@
 use crate::{
-    models::{Account, Hotspot, Oui, Transaction, Validator},
+    models::{Account, Hotspot, Oui, QueryTimeRange, Transaction, Validator},
     *,
 };
 
@@ -43,8 +43,8 @@ pub async fn richest(client: &Client, limit: Option<u32>) -> Result<Vec<Account>
 
 /// Fetches transactions that indicate activity for an account. This includes any
 /// transaction that involves the account, usually as a payer, payee or owner.
-pub fn activity(client: &Client, address: &str) -> Stream<Transaction> {
-    client.fetch_stream(&format!("/accounts/{}/activity", address), NO_QUERY)
+pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Transaction> {
+    client.fetch_stream(&format!("/accounts/{}/activity", address), query)
 }
 
 #[cfg(test)]
