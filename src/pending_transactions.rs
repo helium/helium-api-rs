@@ -1,4 +1,4 @@
-use crate::{models::PendingTxnStatus, *};
+use crate::{models::transactions::PendingTxnStatus, *};
 use serde_json::json;
 
 /// Convert a given transaction to json, ready to be submitted

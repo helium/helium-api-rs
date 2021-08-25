@@ -1,5 +1,5 @@
 use crate::{
-    models::{Account, Hotspot, Oui, QueryTimeRange, Transaction, Validator},
+    models::{transactions::Transaction, Account, Hotspot, Oui, QueryTimeRange, Validator},
     *,
 };
 
