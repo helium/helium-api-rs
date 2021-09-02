@@ -6,7 +6,7 @@ mod geocode;
 mod hotspot;
 mod oracle;
 mod oui;
-mod transaction;
+pub mod transactions;
 mod validator;
 mod values;
 
@@ -16,7 +16,6 @@ pub use geocode::*;
 pub use hotspot::*;
 pub use oracle::*;
 pub use oui::*;
-pub use transaction::*;
 pub use validator::*;
 pub use values::*;
 

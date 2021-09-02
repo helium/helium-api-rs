@@ -1,4 +1,4 @@
-use helium_api::{accounts, Client};
+use helium_api::{accounts, models::QueryTimeRange, Client, IntoVec};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -9,5 +9,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .await?;
     println!("Account: {:?}", account);
+
+    let params = QueryTimeRange {
+        min_time: "-30 day".into(),
+        max_time: "-1 hour".into(),
+    };
+    let transactions = accounts::activity(
+        &client,
+        "13vSgJU5rArGv7SryX9h2n4Rz73LM1Achv1J6eFKgjejoKauPr2",
+        &params,
+    )
+    .into_vec()
+    .await?;
+
+    for txn in transactions {
+        println!("{:?}", txn);
+    }
+
     Ok(())
 }
