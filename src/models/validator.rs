@@ -66,8 +66,7 @@ pub struct Reward {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct StakeStats {
     /// The amount of HNT committed in the staked status
-    #[serde(deserialize_with = "Hnt::deserialize")]
-    pub amount: Hnt,
+    pub amount: f64,
     /// The number of validators in the staked status
     pub count: u64,
 }
