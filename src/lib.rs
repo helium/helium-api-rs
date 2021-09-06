@@ -113,13 +113,23 @@ impl Client {
                             Some(entry) => Ok(Some((entry, (data, client, path)))),
                             None => match data.cursor {
                                 Some(cursor) => {
-                                    let mut data = client
-                                        .fetch_data::<Vec<E>, _>(&path, &[("cursor", &cursor)])
-                                        .await?;
-                                    data.data.reverse();
-                                    match data.data.pop() {
-                                        Some(entry) => Ok(Some((entry, (data, client, path)))),
-                                        None => Ok(None),
+                                    //loop until we find next bit of data or run
+                                    // out of cursors
+                                    let mut data: Data<Vec<E>>;
+                                    let mut cursor = cursor;
+                                    loop {
+                                        data = client
+                                            .fetch_data::<Vec<E>, _>(&path, &[("cursor", &cursor)])
+                                            .await?;
+
+                                        if !data.data.is_empty() {
+                                            data.data.reverse();
+                                            let entry = data.data.pop().unwrap();
+                                            break Ok(Some((entry, (data, client, path))));
+                                        } else if data.cursor.is_none() {
+                                            break Ok(None);
+                                        }
+                                        cursor = data.cursor.unwrap();
                                     }
                                 }
                                 None => Ok(None),
