@@ -2,8 +2,7 @@ use helium_api::{models::QueryTimeRange, validators, Client, IntoVec};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // TODO: Switch back to mainnet when validators go live
-    let client = Client::new_with_base_url("https://testnet-api.helium.wtf/v1".to_string());
+    let client = Client::default();
 
     let stats = validators::stats(&client).await?;
     println!("Stats {:?}", stats);
