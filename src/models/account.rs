@@ -11,6 +11,9 @@ pub struct Account {
     /// The latest balance of the wallet known to the API
     #[serde(deserialize_with = "Hnt::deserialize")]
     pub balance: Hnt,
+    /// The latest staked_balance of the wallet known to the API
+    #[serde(deserialize_with = "Hnt::deserialize")]
+    pub staked_balance: Hnt,
     /// The data credit balance of the wallet known to the API
     pub dc_balance: u64,
     /// The security token balance of the wallet known to the API
