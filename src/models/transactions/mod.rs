@@ -72,6 +72,17 @@ pub use vars_v1::*;
 
 use serde::{Deserialize, Serialize};
 
+// the API provides transactions with extra metadata
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct TransactionRecord {
+    height: u64,
+    time: usize,
+    #[serde(flatten)]
+    txn: Transaction,
+}
+
+// this is the base definition which is more or less
+// directly compatible with the protobuf definition
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(tag = "type", rename_all = "snake_case")]
 /// Represents one of various transactions in a block on the chain.
