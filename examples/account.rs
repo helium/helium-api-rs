@@ -1,4 +1,5 @@
-use helium_api::{accounts, models::QueryTimeRange, Client, IntoVec};
+use futures_util::stream::StreamExt;
+use helium_api::{accounts, models::QueryTimeRange, Client};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,15 +15,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         min_time: "-30 day".into(),
         max_time: "-1 hour".into(),
     };
-    let transactions = accounts::activity(
+
+    let mut account_activity_stream = accounts::activity(
         &client,
         "13vSgJU5rArGv7SryX9h2n4Rz73LM1Achv1J6eFKgjejoKauPr2",
         &params,
-    )
-    .into_vec()
-    .await?;
+    );
 
-    for txn in transactions {
+    while let Some(Ok(txn)) = account_activity_stream.next().await {
         println!("{:?}", txn);
     }
 
