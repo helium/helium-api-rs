@@ -40,6 +40,8 @@ pub struct Hotspot {
     /// when a single hotspot is requested
     #[serde(default)]
     pub speculative_nonce: u64,
+    /// The current reward scale for the hotspot
+    pub reward_scale: Option<f64>,
 }
 
 #[derive(Clone, Serialize, Debug)]
