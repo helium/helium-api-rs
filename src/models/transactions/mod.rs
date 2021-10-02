@@ -75,10 +75,10 @@ use serde::{Deserialize, Serialize};
 // the API provides transactions with extra metadata
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct TransactionRecord {
-    height: u64,
-    time: usize,
+    pub height: u64,
+    pub time: usize,
     #[serde(flatten)]
-    txn: Transaction,
+    pub txn: Transaction,
 }
 
 // this is the base definition which is more or less
