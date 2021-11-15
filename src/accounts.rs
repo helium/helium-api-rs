@@ -34,10 +34,7 @@ pub fn validators(client: &Client, address: &str) -> Stream<Validator> {
 /// descending order
 pub async fn richest(client: &Client, limit: Option<u32>) -> Result<Vec<Account>> {
     client
-        .fetch(
-            &format!("/accounts/rich?limit={}", limit.unwrap_or(1000)),
-            NO_QUERY,
-        )
+        .fetch("/accounts/rich", &[("limit", limit.unwrap_or(1000))])
         .await
 }
 
@@ -55,14 +52,12 @@ mod test {
     #[test]
     async fn all() {
         let client = Client::default();
-        let accounts =
-            accounts::all(&client)
-                .take(10)
-                .fold(vec![], |mut acc, account| async move {
-                    acc.push(account.unwrap().address);
-                    acc
-                });
-        assert_eq!(accounts.await.len(), 10);
+        let accounts = accounts::all(&client)
+            .take(10)
+            .into_vec()
+            .await
+            .expect("accounts");
+        assert_eq!(accounts.len(), 10);
     }
 
     #[test]
@@ -111,7 +106,7 @@ mod test {
         let client = Client::default();
         let richest = accounts::richest(&client, Some(10))
             .await
-            .expect("richet list");
+            .expect("richest list");
         assert_eq!(richest.len(), 10);
     }
 }
