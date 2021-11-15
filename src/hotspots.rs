@@ -20,14 +20,12 @@ mod test {
     #[test]
     async fn all() {
         let client = Client::default();
-        let hotspots =
-            hotspots::all(&client)
-                .take(10)
-                .fold(vec![], |mut acc, hotspot| async move {
-                    acc.push(hotspot.unwrap().address);
-                    acc
-                });
-        assert_eq!(hotspots.await.len(), 10);
+        let hotspots = hotspots::all(&client)
+            .take(10)
+            .into_vec()
+            .await
+            .expect("hotspots");
+        assert_eq!(hotspots.len(), 10);
     }
 
     #[test]

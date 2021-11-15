@@ -39,14 +39,12 @@ mod test {
     #[test]
     async fn all() {
         let client = Client::default();
-        let prices =
-            oracle::prices::all(&client)
-                .take(10)
-                .fold(vec![], |mut acc, price| async move {
-                    acc.push(price.unwrap().block);
-                    acc
-                });
-        assert_eq!(prices.await.len(), 10);
+        let prices = oracle::prices::all(&client)
+            .take(10)
+            .into_vec()
+            .await
+            .expect("oracle prices");
+        assert_eq!(prices.len(), 10);
     }
 
     #[test]

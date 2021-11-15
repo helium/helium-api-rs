@@ -177,23 +177,16 @@ impl Client {
     }
 }
 
-#[async_trait]
-pub trait IntoVec {
-    type Item;
-
-    async fn into_vec(self) -> Result<Vec<Self::Item>>;
-}
+impl<T: ?Sized> IntoVec for T where T: StdStream {}
 
 #[async_trait]
-impl<T> IntoVec for Stream<T>
-where
-    T: std::marker::Send,
-{
-    type Item = T;
-    async fn into_vec(self) -> Result<Vec<Self::Item>> {
-        self.collect::<Vec<error::Result<Self::Item>>>()
-            .await
-            .into_iter()
-            .collect()
+pub trait IntoVec: StreamExt {
+    async fn into_vec<T>(self) -> Result<Vec<T>>
+    where
+        Self: Sized,
+        T: std::marker::Send,
+        Vec<Result<T>>: Extend<Self::Item>,
+    {
+        self.collect::<Vec<Result<T>>>().await.into_iter().collect()
     }
 }
