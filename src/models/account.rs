@@ -8,8 +8,9 @@ pub struct Account {
     /// The wallet address is the base58 check-encoded public key of
     /// the wallet.
     pub address: String,
-    /// Block height of the API when query was made
-    pub block: u64,
+    /// Block height of the API when query was made. When null, there
+    /// is no on-chain record of this account.
+    pub block: Option<u64>,
     /// The latest balance of the wallet at block height
     #[serde(deserialize_with = "Hnt::deserialize")]
     pub balance: Hnt,
