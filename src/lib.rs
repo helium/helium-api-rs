@@ -30,6 +30,8 @@ pub mod vars;
 pub const DEFAULT_TIMEOUT: u64 = 120;
 /// The default base URL if none is specified.
 pub const DEFAULT_BASE_URL: &str = "https://api.helium.io/v1";
+/// The default user agent header if none is specified.
+pub const DEFAULT_USER_AGENT: &str = "Helium API Client";
 /// A utility constant to pass an empty query slice to the various client fetch
 /// functions
 pub const NO_QUERY: &[&str; 0] = &[""; 0];
@@ -44,6 +46,14 @@ pub(crate) struct Data<T> {
 pub struct Client {
     base_url: String,
     client: reqwest::Client,
+}
+
+impl Default for Client {
+    /// Create a new client using the hosted Helium API at
+    /// explorer.helium.foundation
+    fn default() -> Self {
+        Self::new_with_base_url(DEFAULT_BASE_URL.to_string(), DEFAULT_USER_AGENT)
+    }
 }
 
 impl Client {
