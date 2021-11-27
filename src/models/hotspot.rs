@@ -1,5 +1,6 @@
 use super::Dbi;
 use crate::{Error, Result};
+use chrono::{DateTime, Utc};
 
 use serde::{de, Deserialize, Serialize};
 use std::{fmt, str::FromStr};
@@ -42,6 +43,20 @@ pub struct Hotspot {
     pub speculative_nonce: u64,
     /// The current reward scale for the hotspot
     pub reward_scale: Option<f64>,
+    /// The current status for the hotspot
+    pub status: Status,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Status {
+    /// The timestamp of hotspot status, when it last sends gossip
+    pub timestamp: Option<DateTime<Utc>>,
+    /// The online status of the hotspot
+    pub status: Option<String>,
+    /// The IP addresses to listen to hotspot.
+    pub listen_addrs: Option<Vec<String>>,
+    /// The height of the hotspot when gossip is sent out
+    pub height: Option<u64>,
 }
 
 #[derive(Clone, Serialize, Debug)]
