@@ -52,7 +52,7 @@ pub struct Reward {
     #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount: Hnt,
     /// The block the reward was earned in.
-    pub block: i64,
+    pub block: u64,
     /// The validator address is the base58 check-encoded public key of
     /// the validator.
     pub gateway: String,
