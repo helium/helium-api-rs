@@ -1,5 +1,4 @@
 use super::Hnt;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -40,26 +39,6 @@ pub struct ValidatorStats {
     pub staked: StakeStats,
     pub unstaked: StakeStats,
     pub cooldown: StakeStats,
-}
-
-/// Reward for validator
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Reward {
-    /// The owner address is the base58 check-encoded public key of
-    /// the owner's wallet address.
-    pub account: String,
-    /// The reward amount.
-    #[serde(deserialize_with = "Hnt::deserialize")]
-    pub amount: Hnt,
-    /// The block the reward was earned in.
-    pub block: u64,
-    /// The validator address is the base58 check-encoded public key of
-    /// the validator.
-    pub gateway: String,
-    /// The transaction hash of the reward.
-    pub hash: String,
-    /// The timestamp of the rewards.
-    pub timestamp: DateTime<Utc>,
 }
 
 /// Stats for a specific validator stake status
