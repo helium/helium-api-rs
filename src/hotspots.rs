@@ -1,4 +1,4 @@
-use crate::{models::Hotspot, *};
+use crate::{models::{Reward, QueryTimeRange, Hotspot}, *};
 
 /// Get all known hotspots
 pub fn all(client: &Client) -> Stream<Hotspot> {
@@ -10,6 +10,16 @@ pub async fn get(client: &Client, address: &str) -> Result<Hotspot> {
     client
         .fetch(&format!("/hotspots/{}", address), NO_QUERY)
         .await
+}
+
+/// Get rewards for a hotspot
+///
+/// Returns rewards for a given validator per reward block the validator is in,
+/// for a given timeframe. `QueryTimeRange` contains the timestamps given in
+/// 4ISO 8601 format, or in relative time. The block that contains the max_time
+/// timestamp is excluded from the result.
+pub fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Reward> {
+    client.fetch_stream(&format!("/hotspots/{}/rewards", address), query)
 }
 
 #[cfg(test)]

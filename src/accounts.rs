@@ -1,5 +1,5 @@
 use crate::{
-    models::{transactions::Transaction, Account, Hotspot, Oui, QueryTimeRange, Validator},
+    models::{transactions::Transaction, Account, Hotspot, Oui, QueryTimeRange, Validator, Reward},
     *,
 };
 
@@ -42,6 +42,16 @@ pub async fn richest(client: &Client, limit: Option<u32>) -> Result<Vec<Account>
 /// transaction that involves the account, usually as a payer, payee or owner.
 pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Transaction> {
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
+}
+
+/// Get rewards for an account
+///
+/// Returns rewards for a given validator per reward block the validator is in,
+/// for a given timeframe. `QueryTimeRange` contains the timestamps given in
+/// 4ISO 8601 format, or in relative time. The block that contains the max_time
+/// timestamp is excluded from the result.
+pub fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Reward> {
+    client.fetch_stream(&format!("/accounts/{}/rewards", address), query)
 }
 
 #[cfg(test)]

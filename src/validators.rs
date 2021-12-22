@@ -1,5 +1,5 @@
 use crate::{
-    models::{QueryTimeRange, Reward, Validator, ValidatorStats},
+    models::{QueryTimeRange, Validator, ValidatorStats, Reward},
     *,
 };
 
