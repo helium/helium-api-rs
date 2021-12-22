@@ -86,7 +86,7 @@ pub struct Penalty {
     /// The type of penalty
     #[serde(rename = "type")]
     pub kind: PenaltyType,
-    /// The block the penalty occured in.
+    /// The block the penalty occurred in.
     pub height: u64,
     /// The amount of penalty.
     pub amount: f64,
