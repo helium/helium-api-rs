@@ -1,4 +1,7 @@
-use crate::{models::{Reward, QueryTimeRange, Hotspot}, *};
+use crate::{
+    models::{Hotspot, QueryTimeRange, Reward},
+    *,
+};
 
 /// Get all known hotspots
 pub fn all(client: &Client) -> Stream<Hotspot> {
