@@ -21,9 +21,7 @@ pub struct StateChannel {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct StateChannelSummary {
-    pub owner: String,
     pub num_packets: u64,
     pub num_dcs: u64,
-    pub location: String,
     pub client: String,
 }
