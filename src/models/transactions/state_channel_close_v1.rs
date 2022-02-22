@@ -2,9 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct StateChannelCloseV1 {
-    pub height: u64,
     pub hash: String,
-    pub time: u64,
     pub state_channel: StateChannel,
     pub conflicts_with: Option<String>,
     pub closer: String,
@@ -23,9 +21,7 @@ pub struct StateChannel {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct StateChannelSummary {
-    pub owner: String,
     pub num_packets: u64,
     pub num_dcs: u64,
-    pub location: String,
     pub client: String,
 }

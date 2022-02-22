@@ -9,8 +9,6 @@ pub struct VarsV1 {
     pub nonce: u64,
     pub proof: String,
     pub version_predicate: u64,
-    pub time: u64,
     pub master_key: Option<String>,
     pub key_proof: String,
-    pub height: u64,
 }
