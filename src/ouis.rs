@@ -30,14 +30,14 @@ mod test {
 
     #[test]
     async fn all() {
-        let client = Client::default();
+        let client = get_test_client();
         let ouis = ouis::all(&client).into_vec().await.expect("ouis");
         assert!(ouis.len() > 0);
     }
 
     #[test]
     async fn get() {
-        let client = Client::default();
+        let client = get_test_client();
         let oui = ouis::get(&client, 1).await.expect("oui");
         assert_eq!(
             oui.owner,
@@ -47,14 +47,14 @@ mod test {
 
     #[test]
     async fn last() {
-        let client = Client::default();
+        let client = get_test_client();
         let oui = ouis::last(&client).await.expect("oui");
         assert!(oui.oui >= 1,);
     }
 
     #[test]
     async fn stats() {
-        let client = Client::default();
+        let client = get_test_client();
         let stats = ouis::stats(&client).await.expect("stats");
         assert!(stats.count >= 1,);
     }

@@ -27,7 +27,7 @@ mod test {
 
     #[test]
     async fn named() {
-        let client = Client::default();
+        let client = get_test_client();
         let vars = vars::get_named(&client, &["txn_fees"])
             .await
             .expect("named vars");

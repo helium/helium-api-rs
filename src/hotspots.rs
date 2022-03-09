@@ -19,7 +19,7 @@ mod test {
 
     #[test]
     async fn all() {
-        let client = Client::default();
+        let client = get_test_client();
         let hotspots = hotspots::all(&client)
             .take(10)
             .into_vec()
@@ -30,7 +30,7 @@ mod test {
 
     #[test]
     async fn get() {
-        let client = Client::default();
+        let client = get_test_client();
         let hotspot = hotspots::get(
             &client,
             "112vvSrNAwJRSmR54aqFLEhbr6cy6T4Ufuja4VWVrxvkUAUxL2yG",
