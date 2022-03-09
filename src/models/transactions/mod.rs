@@ -264,7 +264,10 @@ mod test {
             .await
             .expect("StateChannelCloseV1");
         if let Transaction::StateChannelCloseV1(sc) = txn {
-            assert_eq!(sc.height, 861884)
+            assert_eq!(
+                sc.closer,
+                "11QVeYckasapcrmqjZqtfGTjE154uHHUvYPPwW6EMwzrpsdr213"
+            )
         } else {
             assert!(false)
         }
