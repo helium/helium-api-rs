@@ -7,7 +7,6 @@ pub struct UnstakeValidatorV1 {
     pub owner: String,
     pub owner_signature: String,
     pub fee: u64,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub stake_amount: Hnt,
     pub stake_release_height: u64,
     pub hash: String,

@@ -8,6 +8,5 @@ pub struct SecurityExchangeV1 {
     pub nonce: u64,
     pub payee: String,
     pub payer: String,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount: Hnt,
 }

@@ -13,7 +13,6 @@ pub struct PaymentV2 {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct PaymentV2Payment {
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount: Hnt,
     pub memo: Option<String>,
     pub payee: String,
