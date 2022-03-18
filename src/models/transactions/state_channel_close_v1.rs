@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct StateChannelCloseV1 {
     pub hash: String,
     pub state_channel: StateChannel,
-    pub conflicts_with: Option<String>,
+    pub conflicts_with: Option<StateChannel>,
     pub closer: String,
 }
 
