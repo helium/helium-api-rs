@@ -8,6 +8,5 @@ pub struct AddGatewayV1 {
     pub owner: String,
     pub payer: String,
     pub gateway: String,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub staking_fee: Hnt,
 }

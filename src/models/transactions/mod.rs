@@ -120,7 +120,7 @@ mod test {
 
     #[test]
     async fn txn() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "1gidN7e6OKn405Fru_0sGhsqca3lTsrfGKrM4dwM_E8")
             .await
             .expect("PocRequestV1");
@@ -135,7 +135,7 @@ mod test {
     }
     #[test]
     async fn consensus_group_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "yh01SJk8dvyqb-BGXxkHFUuLi6wF1pfL0VEFStJUt-E")
             .await
             .expect("ConsensusGroupV1");
@@ -148,7 +148,7 @@ mod test {
     #[test]
     async fn payment_v2() {
         //dosqfzzaYtoGx278w4Xu5dnYt7aSZIkD1-IbtiiLQQM
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "C_jJZLKBOv_gRQ6P6wEpZPiRVAjf44FOx1iHOFD4haA")
             .await
             .expect("PaymentV2");
@@ -160,7 +160,7 @@ mod test {
     }
     #[test]
     async fn poc_receipts_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "8RaF-G4pvMVuIXfBYhdqNuIlFSEHPm_rC8TH-h4JYdE")
             .await
             .expect("PocReceipt");
@@ -173,7 +173,7 @@ mod test {
 
     #[test]
     async fn payment_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "iMSckt_hUcMFY_d7W-QOupY0MGq_g3-CC2dq3P-HWIw")
             .await
             .expect("PaymentV1");
@@ -188,7 +188,7 @@ mod test {
     }
     #[test]
     async fn rewards_v2() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "X0HNRGZ1HAX51CR8qS6LTopAosjFkuaaKXl850IpNDE")
             .await
             .expect("RewardsV2");
@@ -200,7 +200,7 @@ mod test {
     }
     #[test]
     async fn assert_location_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "_I16bycHeltuOo7eyqa4uhv2Bc7awcztZflyvRkVZ24")
             .await
             .expect("AssertLocationV1");
@@ -212,7 +212,7 @@ mod test {
     }
     #[test]
     async fn assert_location_v2() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "TfjRv733Q9FBQ1_unw1c9g5ewVmMBuyf7APuyxKEqrw")
             .await
             .expect("AssertLocationV2");
@@ -227,7 +227,7 @@ mod test {
     }
     #[test]
     async fn add_gateway_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "aoTggHSgaBAamuUUrXnY42jDZ5WUBxE0k-tshvfn35E")
             .await
             .expect("AddGatewayV1");
@@ -243,7 +243,7 @@ mod test {
 
     #[test]
     async fn add_gateway_v1_error() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "ia3c386ZnlVJorvo60WtXEFxy_0w35ImoIdmnW5lpJ8")
             .await
             .expect("AddGatewayV1");
@@ -259,12 +259,15 @@ mod test {
 
     #[test]
     async fn state_channel_close_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "vjtEQK0vn1w69fV3TMrlnN6L_qprsoWM_-7DVspmLL8")
             .await
             .expect("StateChannelCloseV1");
         if let Transaction::StateChannelCloseV1(sc) = txn {
-            assert_eq!(sc.height, 861884)
+            assert_eq!(
+                sc.closer,
+                "11QVeYckasapcrmqjZqtfGTjE154uHHUvYPPwW6EMwzrpsdr213"
+            )
         } else {
             assert!(false)
         }
@@ -272,7 +275,7 @@ mod test {
 
     #[test]
     async fn transfer_hotspot_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "fSFua7A8G41K05QXAvJi5N2OB0QqmQ7xp7u-My4rYHc")
             .await
             .expect("TransferHotspotV1");
@@ -288,7 +291,7 @@ mod test {
 
     #[test]
     async fn transfer_routing_v1_new_xor() {
-        let client = Client::default();
+        let client = get_test_client();
 
         let txn = transactions::get(&client, "EjL6nBsSxovJluW-kdAaPcEiRt0OPIATOmlHD1Lth4Y")
             .await
@@ -312,7 +315,7 @@ mod test {
 
     #[test]
     async fn unstake_validator_v1() {
-        let client = Client::default();
+        let client = get_test_client();
 
         let txn = transactions::get(&client, "fMT-7_f2WQNKAYIQWX2-V258KsoI61HYbt_zAbN3A1I")
             .await
@@ -332,7 +335,7 @@ mod test {
 
     #[test]
     async fn vars_v1() {
-        let client = Client::default();
+        let client = get_test_client();
         let txn = transactions::get(&client, "SB47bwBKP3ud1KdASYAndxkoIhZCXgPtusLUIsS7Q2o")
             .await
             .expect("VarsV1");

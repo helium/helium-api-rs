@@ -51,7 +51,7 @@ mod test {
 
     #[test]
     async fn all() {
-        let client = Client::default();
+        let client = get_test_client();
         let accounts = accounts::all(&client)
             .take(10)
             .into_vec()
@@ -62,7 +62,7 @@ mod test {
 
     #[test]
     async fn get() {
-        let client = Client::default();
+        let client = get_test_client();
         let account = accounts::get(
             &client,
             "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
@@ -77,7 +77,7 @@ mod test {
 
     #[test]
     async fn ouis() {
-        let client = Client::default();
+        let client = get_test_client();
         let ouis = accounts::ouis(
             &client,
             "13tyMLKRFYURNBQqLSqNJg9k41maP1A7Bh8QYxR13oWv7EnFooc",
@@ -90,7 +90,7 @@ mod test {
 
     #[test]
     async fn hotspots() {
-        let client = Client::default();
+        let client = get_test_client();
         let hotspots = accounts::hotspots(
             &client,
             "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
@@ -103,7 +103,7 @@ mod test {
 
     #[test]
     async fn richest() {
-        let client = Client::default();
+        let client = get_test_client();
         let richest = accounts::richest(&client, Some(10))
             .await
             .expect("richest list");

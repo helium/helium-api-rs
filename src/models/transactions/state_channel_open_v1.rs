@@ -9,7 +9,6 @@ pub struct StateChannelOpenV1 {
     pub hash: String,
     pub nonce: u64,
     pub owner: String,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount: Hnt,
     pub expire_within: u64,
 }

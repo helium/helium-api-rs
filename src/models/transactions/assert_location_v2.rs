@@ -12,6 +12,5 @@ pub struct AssertLocationV2 {
     pub gateway: String,
     pub location: String,
     pub elevation: i64,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub staking_fee: Hnt,
 }

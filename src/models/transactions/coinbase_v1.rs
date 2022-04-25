@@ -5,6 +5,5 @@ use serde::{Deserialize, Serialize};
 pub struct CoinbaseV1 {
     pub hash: String,
     pub payee: String,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount: Hnt,
 }

@@ -1,12 +1,12 @@
 use crate::{Error, Result};
 use core::fmt;
 use rust_decimal::prelude::*;
-use serde::{de::Deserializer, Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::str::FromStr;
 
 macro_rules! decimal_scalar {
     ($stype:ident, $scalar:literal, $scale:literal) => {
-        #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+        #[derive(Clone, Copy, Debug, PartialEq)]
         pub struct $stype(Decimal);
 
         impl FromStr for $stype {
@@ -18,6 +18,26 @@ macro_rules! decimal_scalar {
                     Ok(data) => Ok(Self(data)),
                     Err(_) => Err(Error::decimals(s)),
                 }
+            }
+        }
+
+        impl Serialize for $stype {
+            fn serialize<S>(&self, s: S) -> std::result::Result<S::Ok, S::Error>
+            where
+                S: Serializer,
+            {
+                let u: u64 = u64::from(*self);
+                s.serialize_u64(u)
+            }
+        }
+
+        impl<'de> Deserialize<'de> for $stype {
+            fn deserialize<D>(d: D) -> std::result::Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                let val = u64::deserialize(d)?;
+                Ok(Self::from(val))
             }
         }
 
@@ -34,14 +54,6 @@ macro_rules! decimal_scalar {
 
             pub fn get_decimal(&self) -> Decimal {
                 self.0
-            }
-
-            pub fn deserialize<'de, D>(d: D) -> std::result::Result<Self, D::Error>
-            where
-                D: Deserializer<'de>,
-            {
-                let val = u64::deserialize(d)?;
-                Ok(Self::from(val))
             }
 
             pub fn deserialize_option<'de, D>(d: D) -> std::result::Result<Option<Self>, D::Error>
@@ -105,3 +117,17 @@ decimal_scalar!(Hnt, 100_000_000, 8);
 decimal_scalar!(Hst, 100_000_000, 8);
 decimal_scalar!(Usd, 100_000_000, 8);
 decimal_scalar!(Dbi, 10, 1);
+
+#[cfg(test)]
+mod tests {
+    use serde_test::{assert_tokens, Token};
+
+    use super::*;
+
+    #[test]
+    fn test_ser_hnt() {
+        let hnt = Hnt::from(5500);
+
+        assert_tokens(&hnt, &[Token::U64(5500)]);
+    }
+}

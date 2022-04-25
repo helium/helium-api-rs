@@ -38,7 +38,7 @@ mod test {
 
     #[test]
     async fn all() {
-        let client = Client::default();
+        let client = get_test_client();
         let prices = oracle::prices::all(&client)
             .take(10)
             .into_vec()
@@ -49,14 +49,14 @@ mod test {
 
     #[test]
     async fn current() {
-        let client = Client::default();
+        let client = get_test_client();
         let price = oracle::prices::current(&client).await.expect("price");
         assert!(price.block > 0);
     }
 
     #[test]
     async fn at_block() {
-        let client = Client::default();
+        let client = get_test_client();
         let price = oracle::prices::at_block(&client, 763816)
             .await
             .expect("price");
@@ -65,7 +65,7 @@ mod test {
 
     #[test]
     async fn predictions() {
-        let client = Client::default();
+        let client = get_test_client();
         let predictions = oracle::predictions(&client).await;
         // predictions may be an empty list
         assert!(predictions.is_ok());

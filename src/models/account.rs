@@ -12,7 +12,6 @@ pub struct Account {
     /// is no on-chain record of this account.
     pub block: Option<u64>,
     /// The latest balance of the wallet at block height
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub balance: Hnt,
     /// The latest staked_balance of the wallet at block height
     #[serde(deserialize_with = "Hnt::deserialize")]

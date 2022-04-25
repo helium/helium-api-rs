@@ -9,6 +9,5 @@ pub struct TransferHotspotV1 {
     pub seller: String,
     pub gateway: String,
     pub buyer_nonce: u64,
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub amount_to_seller: Hnt,
 }

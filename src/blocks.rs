@@ -13,7 +13,7 @@ mod test {
 
     #[test]
     async fn heigh() {
-        let client = Client::default();
+        let client = get_test_client();
         let height = blocks::height(&client).await.expect("height");
         assert!(height > 0);
     }

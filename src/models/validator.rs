@@ -12,7 +12,6 @@ pub struct Validator {
     /// the owner of the validator.
     pub owner: String,
     /// The staked amount for the validator
-    #[serde(deserialize_with = "Hnt::deserialize")]
     pub stake: Hnt,
     /// The last heartbeat transaction of the validator
     pub last_heartbeat: u64,
