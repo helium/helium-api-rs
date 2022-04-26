@@ -186,7 +186,13 @@ pub trait IntoVec: StreamExt {
 
 #[cfg(test)]
 fn get_test_client() -> Client {
+    use std::{env, thread, time};
     const USER_AGENT: &str = "helium-api-test/0.1.0";
     const BASE_URL: &str = "https://api.helium.io/v1";
+    let duration = time::Duration::from_millis(env::var("TEST_DELAY_MS").map_or(0, |v| {
+        v.parse::<u64>()
+            .expect("TEST_DELAY_MS cannot be parsed as u64")
+    }));
+    thread::sleep(duration);
     Client::new_with_base_url(BASE_URL.into(), USER_AGENT)
 }
