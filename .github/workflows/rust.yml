@@ -35,7 +35,8 @@ jobs:
 
       - name: Run tests
         run: cargo test -- --test-threads 1
-
+        env:
+          TEST_DELAY_MS: 1000
       - name: Build
         run: cargo build --all
 
