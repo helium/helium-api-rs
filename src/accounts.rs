@@ -1,6 +1,7 @@
 use crate::{
     models::{
-        transactions::ProcessedTransaction, Account, Hotspot, Oui, QueryTimeRange, Validator,
+        transactions::{ProcessedTransaction, RoleTransaction},
+        Account, Hotspot, Oui, QueryTimeRange, Validator,
     },
     *,
 };
@@ -48,6 +49,12 @@ pub fn activity(
     query: &QueryTimeRange,
 ) -> Stream<ProcessedTransaction> {
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
+}
+
+/// Fetches transactions related to the account. This does not include the
+/// transaction itself but transaction metadata and hash is provided.
+pub fn roles(client: &Client, address: &str) -> Stream<RoleTransaction> {
+    client.fetch_stream(&format!("/accounts/{}/roles", address), NO_QUERY)
 }
 
 #[cfg(test)]

@@ -81,6 +81,15 @@ pub struct ProcessedTransaction {
     pub txn: Transaction,
 }
 
+// the API provides transactions with extra metadata
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct RoleTransaction {
+    pub r#type: String,
+    pub time: usize,
+    pub height: usize,
+    pub hash: String,
+}
+
 // this is the base definition which is more or less
 // directly compatible with the protobuf definition
 #[derive(Clone, Serialize, Deserialize, Debug)]
