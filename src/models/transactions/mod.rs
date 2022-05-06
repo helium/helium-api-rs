@@ -132,6 +132,48 @@ pub enum Transaction {
     #[serde(other)]
     Unknown, // Any other transaction not supported
 }
+
+impl Transaction {
+    pub fn hash(&self) -> &str {
+        match self {
+            Transaction::AddGatewayV1(txn) => &txn.hash,
+            Transaction::AssertLocationV1(txn) => &txn.hash,
+            Transaction::AssertLocationV2(txn) => &txn.hash,
+            Transaction::CoinbaseV1(txn) => &txn.hash,
+            Transaction::ConsensusGroupFailureV1(txn) => &txn.hash,
+            Transaction::ConsensusGroupV1(txn) => &txn.hash,
+            Transaction::CreateHtlcV1(txn) => &txn.hash,
+            Transaction::DcCoinbaseV1(txn) => &txn.hash,
+            Transaction::GenGatewayV1(txn) => &txn.hash,
+            Transaction::GenPriceOracleV1(txn) => &txn.hash,
+            Transaction::OuiV1(txn) => &txn.hash,
+            Transaction::PaymentV1(txn) => &txn.hash,
+            Transaction::PaymentV2(txn) => &txn.hash,
+            Transaction::PocReceiptsV1(txn) => &txn.hash,
+            Transaction::PocRequestV1(txn) => &txn.hash,
+            Transaction::PriceOracleV1(txn) => &txn.hash,
+            Transaction::RedeemHtlcV1(txn) => &txn.hash,
+            Transaction::RewardsV1(txn) => &txn.hash,
+            Transaction::RewardsV2(txn) => &txn.hash,
+            Transaction::RoutingV1(txn) => &txn.hash,
+            Transaction::SecurityCoinbaseV1(txn) => &txn.hash,
+            Transaction::SecurityExchangeV1(txn) => &txn.hash,
+            Transaction::StakeValidatorV1(txn) => &txn.hash,
+            Transaction::StateChannelCloseV1(txn) => &txn.hash,
+            Transaction::StateChannelOpenV1(txn) => &txn.hash,
+            Transaction::TokenBurnExchangeRateV1(txn) => &txn.hash,
+            Transaction::TokenBurnV1(txn) => &txn.hash,
+            Transaction::TransferHotspotV1(txn) => &txn.hash,
+            Transaction::TransferValidatorStakeV1(txn) => &txn.hash,
+            Transaction::UnstakeValidatorV1(txn) => &txn.hash,
+            Transaction::UpdateGatewayOuiV1(txn) => &txn.hash,
+            Transaction::ValidatorHeartbeatV1(txn) => &txn.hash,
+            Transaction::VarsV1(txn) => &txn.hash,
+            Transaction::Unknown => "unknown_txn",
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
