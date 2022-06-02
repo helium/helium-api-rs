@@ -28,7 +28,13 @@ pub async fn block_at_height(client: &Client, height: u64) -> Result<BlockData> 
     let block: BlockData = client
         .fetch(&format!("/blocks/{}", height), NO_QUERY)
         .await?;
-    println!("Block: {:?}", block);
+    Ok(block)
+}
+
+pub async fn block_at_hash(client: &Client, hash: &str) -> Result<BlockData> {
+    let block: BlockData = client
+        .fetch(&format!("/blocks/hash/{}", hash), NO_QUERY)
+        .await?;
     Ok(block)
 }
 
@@ -84,6 +90,20 @@ mod test {
         let block = blocks::block_at_height(&client, 1379987)
             .await
             .expect("block_at_height");
+        assert!(block.height == 1379987);
+        assert!(block.hash == "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8");
+        assert!(block.prev_hash == "3E6pPSnAVNlJMKz-CWtnBpwilLaM3TypxSYAgtaRweo");
+        assert!(block.transaction_count == 194);
+        assert!(block.time == 1654199928);
+        assert!(block.snapshot_hash == "");
+    }
+
+    #[test]
+    async fn block_at_hash() {
+        let client = get_test_client();
+        let block = blocks::block_at_hash(&client, "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8")
+            .await
+            .expect("block_at_hash");
         assert!(block.height == 1379987);
         assert!(block.hash == "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8");
         assert!(block.prev_hash == "3E6pPSnAVNlJMKz-CWtnBpwilLaM3TypxSYAgtaRweo");
