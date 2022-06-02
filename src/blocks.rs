@@ -26,7 +26,7 @@ pub fn transactions_at_height(client: &Client, block: u64) -> Stream<Transaction
     )
 }
 
-pub fn transactions_at_hash(client: &Client, hash: &str) -> Stream<Transaction> {
+pub fn transactions_with_hash(client: &Client, hash: &str) -> Stream<Transaction> {
     client.fetch_stream(
         format!("/blocks/hash/{}/transactions", hash).as_str(),
         NO_QUERY,
