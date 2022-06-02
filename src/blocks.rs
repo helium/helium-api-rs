@@ -26,7 +26,7 @@ pub fn transactions_at_height(client: &Client, block: u64) -> Stream<Transaction
     )
 }
 
-pub fn transactions_with_hash(client: &Client, hash: &str) -> Stream<Transaction> {
+pub fn transactions_at_block_hash(client: &Client, hash: &str) -> Stream<Transaction> {
     client.fetch_stream(
         format!("/blocks/hash/{}/transactions", hash).as_str(),
         NO_QUERY,
@@ -66,14 +66,16 @@ mod test {
     }
 
     #[test]
-    async fn transactions_with_hash() {
+    async fn transactions_at_block_hash() {
         let client = get_test_client();
-        let transactions =
-            blocks::transactions_with_hash(&client, "BogDArZ5QxbgSd4wLmCS8NRtRzwvCA5fGn1V2TtsYoU")
-                .take(10)
-                .into_vec()
-                .await
-                .expect("transactions");
+        let transactions = blocks::transactions_at_block_hash(
+            &client,
+            "BogDArZ5QxbgSd4wLmCS8NRtRzwvCA5fGn1V2TtsYoU",
+        )
+        .take(10)
+        .into_vec()
+        .await
+        .expect("transactions");
         assert_eq!(transactions.len(), 10);
     }
 }
