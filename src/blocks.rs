@@ -1,5 +1,5 @@
 use crate::{
-    models::{transactions::Transaction, BlockStats, Descriptions, Height},
+    models::{transactions::Transaction, BlockData, BlockStats, Descriptions, Height},
     *,
 };
 
@@ -22,6 +22,14 @@ pub async fn descriptions(client: &Client, cursor: Option<&str>) -> Result<Descr
         .fetch_data("/blocks", &query)
         .await
         .map(|Data { data, cursor }| Descriptions { data, cursor })
+}
+
+pub async fn block_at_height(client: &Client, height: u64) -> Result<BlockData> {
+    let block: BlockData = client
+        .fetch(&format!("/blocks/{}", height), NO_QUERY)
+        .await?;
+    println!("Block: {:?}", block);
+    Ok(block)
 }
 
 pub fn transactions_at_height(client: &Client, block: u64) -> Stream<Transaction> {
@@ -68,6 +76,20 @@ mod test {
             .await
             .expect("descriptions");
         assert!(descriptions.data.len() > 0);
+    }
+
+    #[test]
+    async fn block_at_height() {
+        let client = get_test_client();
+        let block = blocks::block_at_height(&client, 1379987)
+            .await
+            .expect("block_at_height");
+        assert!(block.height == 1379987);
+        assert!(block.hash == "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8");
+        assert!(block.prev_hash == "3E6pPSnAVNlJMKz-CWtnBpwilLaM3TypxSYAgtaRweo");
+        assert!(block.transaction_count == 194);
+        assert!(block.time == 1654199928);
+        assert!(block.snapshot_hash == "");
     }
 
     #[test]
