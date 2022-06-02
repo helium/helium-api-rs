@@ -20,10 +20,7 @@ pub async fn descriptions(client: &Client, cursor: Option<&str>) -> Result<Descr
 }
 
 pub fn transactions_at_height(client: &Client, block: u64) -> Stream<Transaction> {
-    client.fetch_stream(
-        format!("/blocks/{}/transactions", block.to_string()).as_str(),
-        NO_QUERY,
-    )
+    client.fetch_stream(format!("/blocks/{}/transactions", block).as_str(), NO_QUERY)
 }
 
 pub fn transactions_at_block_hash(client: &Client, hash: &str) -> Stream<Transaction> {
