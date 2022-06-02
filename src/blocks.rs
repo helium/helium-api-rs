@@ -1,5 +1,5 @@
 use crate::{
-    models::{transactions::Transaction, Descriptions, Height},
+    models::{transactions::Transaction, BlockStats, Descriptions, Height},
     *,
 };
 
@@ -7,6 +7,11 @@ use crate::{
 pub async fn height(client: &Client) -> Result<u64> {
     let height: Height = client.fetch("/blocks/height", NO_QUERY).await?;
     Ok(height.height)
+}
+
+pub async fn stats(client: &Client) -> Result<BlockStats> {
+    let stats = client.fetch("/blocks/stats", NO_QUERY).await?;
+    Ok(stats)
 }
 
 /// Retrieves block descriptions. Blocks descriptions are paged.
@@ -40,6 +45,20 @@ mod test {
         let client = get_test_client();
         let height = blocks::height(&client).await.expect("height");
         assert!(height > 0);
+    }
+
+    #[test]
+    async fn stats() {
+        let client = get_test_client();
+        let stats = blocks::stats(&client).await.expect("stats");
+        assert!(stats.last_hour.avg > 0.0);
+        assert!(stats.last_hour.stddev > 0.0);
+        assert!(stats.last_day.avg > 0.0);
+        assert!(stats.last_day.stddev > 0.0);
+        assert!(stats.last_week.avg > 0.0);
+        assert!(stats.last_week.stddev > 0.0);
+        assert!(stats.last_month.avg > 0.0);
+        assert!(stats.last_month.stddev > 0.0);
     }
 
     #[test]
