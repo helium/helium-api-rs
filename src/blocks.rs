@@ -66,10 +66,10 @@ mod test {
     }
 
     #[test]
-    async fn transactions_at_hash() {
+    async fn transactions_with_hash() {
         let client = get_test_client();
         let transactions =
-            blocks::transactions_at_hash(&client, "BogDArZ5QxbgSd4wLmCS8NRtRzwvCA5fGn1V2TtsYoU")
+            blocks::transactions_with_hash(&client, "BogDArZ5QxbgSd4wLmCS8NRtRzwvCA5fGn1V2TtsYoU")
                 .take(10)
                 .into_vec()
                 .await
