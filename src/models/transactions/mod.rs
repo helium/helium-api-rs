@@ -13,6 +13,7 @@ mod payment_v1;
 mod payment_v2;
 mod pending_txn_status;
 mod poc_receipts_v1;
+mod poc_receipts_v2;
 mod poc_request_v1;
 mod price_oracle_v1;
 mod redeem_htlc_v1;
@@ -49,6 +50,7 @@ pub use payment_v1::*;
 pub use payment_v2::*;
 pub use pending_txn_status::*;
 pub use poc_receipts_v1::*;
+pub use poc_receipts_v2::*;
 pub use poc_request_v1::*;
 pub use price_oracle_v1::*;
 pub use redeem_htlc_v1::*;
@@ -90,6 +92,7 @@ pub enum Transaction {
     PaymentV1(PaymentV1),
     PaymentV2(PaymentV2),
     PocReceiptsV1(PocReceiptsV1),
+    PocReceiptsV2(PocReceiptsV2),
     PocRequestV1(PocRequestV1),
     PriceOracleV1(PriceOracleV1),
     RedeemHtlcV1(RedeemHtlcV1),
@@ -166,6 +169,19 @@ mod test {
             .expect("PocReceipt");
         if let Transaction::PocReceiptsV1(pr) = txn {
             assert_eq!(pr.hash, "8RaF-G4pvMVuIXfBYhdqNuIlFSEHPm_rC8TH-h4JYdE")
+        } else {
+            assert!(false)
+        }
+    }
+
+    #[test]
+    async fn poc_receipts_v2() {
+        let client = get_test_client();
+        let txn = transactions::get(&client, "077Y_ArUR90ptUMAkiKPp-9NIZfqol5TgGFkoJZa_K8")
+            .await
+            .expect("PocReceipt");
+        if let Transaction::PocReceiptsV2(pr) = txn {
+            assert_eq!(pr.hash, "077Y_ArUR90ptUMAkiKPp-9NIZfqol5TgGFkoJZa_K8")
         } else {
             assert!(false)
         }
