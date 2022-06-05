@@ -6,6 +6,20 @@ pub struct Height {
     pub height: u64,
 }
 
+#[derive(Clone, Debug, Deserialize)]
+pub struct BlockStats {
+    pub last_day: BlockStatsMeasures,
+    pub last_hour: BlockStatsMeasures,
+    pub last_month: BlockStatsMeasures,
+    pub last_week: BlockStatsMeasures,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct BlockStatsMeasures {
+    pub avg: f64,
+    pub stddev: f64,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Descriptions {
     pub data: Vec<BlockData>,
