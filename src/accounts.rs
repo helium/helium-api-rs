@@ -49,7 +49,7 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
 }
 
-/// Returns the roles for an account as a Stream
+/// Fetches transactions that indicate an account as a participant. This includes any transaction that involves the account, usually as a payer, payee or owner.
 ///
 /// ## Examples
 ///
@@ -81,8 +81,9 @@ pub fn roles(client: &Client, address: &str, query: &QueryFilterWithTimeRange) -
     client.fetch_stream(&format!("/accounts/{}/roles", address), query)
 }
 
-/// Returns the roles count for an account
+/// Count transactions that indicate activity for an account. This includes any transaction that involves the account, usually as a payer, payee or owner.
 ///
+/// The results are a map keyed by the given `filter_types` and the count of transaction of that type.
 /// ## Examples
 ///
 /// ```
@@ -180,7 +181,14 @@ pub fn pending_transactions(client: &Client, address: &str) -> Stream<PendingTra
     )
 }
 
-///Fetches the outstanding transactions for the given account. See Pending Transactions for details.
+///Returns reward entries by block and gateway for a given account in a timeframe. Timestamps are given in *ISO 8601* format. The block that contains the `max_time` timestamp is excluded from the result.
+///
+///The result will be a list of rewards between `min_time` and `max_time` both given in UTC. Both default to "now" which means that at least one of the two parameters is required.
+///
+///The result includes a `type` field which is the type of activity that generated the reward.
+///
+/// ### Note:
+/// For older reward results, if the `type` is None the amount is a total for that account or hotspot in the given block.
 ///
 ///## Examples
 ///```
@@ -212,6 +220,8 @@ pub fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream
 ///
 /// The result includes a `type` field which is the type of activity that generated the reward.
 ///
+/// #### Note:
+/// For older reward results, if the `type` is None the amount is a total for that account or hotspot in the given block.
 ///## Examples
 ///```
 ///      use crate::*;
