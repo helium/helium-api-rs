@@ -34,3 +34,13 @@ pub struct Account {
     #[serde(default)]
     pub speculative_sec_nonce: u64,
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Role {
+    #[serde(rename = "type")]
+    pub role_type: String,
+    pub time: u64,
+    pub role: String,
+    pub height: u64,
+    pub hash: String,
+}

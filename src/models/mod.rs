@@ -27,3 +27,13 @@ pub struct QueryTimeRange {
     /// ISO 8601 timestamp or relative time (-3 hour) maximum time range
     pub max_time: String,
 }
+
+#[derive(Clone, Debug, Serialize)]
+pub struct QueryFilterWithTimeRange {
+    /// ISO 8601 timestamp or relative time (-3 hour) minimum time range
+    pub min_time: Option<String>,
+    /// ISO 8601 timestamp or relative time (-3 hour) maximum time range
+    pub max_time: Option<String>,
+    pub filter_types: Option<String>,
+    pub limit: Option<u64>,
+}

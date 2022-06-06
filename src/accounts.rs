@@ -1,5 +1,8 @@
 use crate::{
-    models::{transactions::Transaction, Account, Hotspot, Oui, QueryTimeRange, Validator},
+    models::{
+        transactions::Transaction, Account, Hotspot, Oui, QueryFilterWithTimeRange, QueryTimeRange,
+        Role, Validator,
+    },
     *,
 };
 
@@ -42,6 +45,33 @@ pub async fn richest(client: &Client, limit: Option<u32>) -> Result<Vec<Account>
 /// transaction that involves the account, usually as a payer, payee or owner.
 pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Transaction> {
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
+}
+
+/// Returns the roles for an account as a Stream
+///
+/// ## Examples
+///
+/// ```
+///        let client = get_test_client();
+///        let roles = accounts::roles(
+///            &client,
+///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///            &QueryFilterWithTimeRange {
+///                filter_types: Some("rewards_v2".to_string()),
+///                min_time: Some("2022-06-05T00:00:00Z".to_string()),
+///                max_time: Some("2022-06-06T00:00:00Z".to_string()),
+///                limit: Some(10),
+///            },
+///        )
+///        .into_vec()
+///        .await
+///        .expect("role list");
+/// ```
+///
+/// ## API Documentation
+/// Find more information about the API call under [`Roles for Account`](https://docs.helium.com/api/blockchain/accounts).
+pub fn roles(client: &Client, address: &str, query: &QueryFilterWithTimeRange) -> Stream<Role> {
+    client.fetch_stream(&format!("/accounts/{}/roles", address), query)
 }
 
 #[cfg(test)]
@@ -108,5 +138,48 @@ mod test {
             .await
             .expect("richest list");
         assert_eq!(richest.len(), 10);
+    }
+
+    #[test]
+    async fn roles() {
+        let client = get_test_client();
+        let roles = accounts::roles(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryFilterWithTimeRange {
+                filter_types: None,
+                min_time: Some("2022-06-01T00:00:00Z".to_string()),
+                max_time: Some("2022-06-06T00:00:00Z".to_string()),
+                limit: None,
+            },
+        )
+        .into_vec()
+        .await
+        .expect("role list");
+
+        assert!(roles.len() > 0);
+    }
+
+    #[test]
+    async fn roles_filter() {
+        let client = get_test_client();
+        let roles = accounts::roles(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryFilterWithTimeRange {
+                filter_types: Some("rewards_v2".to_string()),
+                min_time: Some("2022-06-01T00:00:00Z".to_string()),
+                max_time: Some("2022-06-06T00:00:00Z".to_string()),
+                limit: Some(10),
+            },
+        )
+        .into_vec()
+        .await
+        .expect("role list");
+
+        roles.iter().for_each(|role| {
+            assert_eq!(role.role_type, "rewards_v2");
+        });
+        assert!(roles.len() == 10);
     }
 }
