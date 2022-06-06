@@ -1,6 +1,7 @@
 use crate::{
     models::{
-        transactions::Transaction, Account, Hotspot, Oui, QueryFilter, QueryFilterWithTimeRange,
+        transactions::{Challenge, Transaction},
+        Account, Hotspot, Oui, QueryFilter, QueryFilterWithTimeRange, QueryLimitWithTimeRange,
         QueryTimeRange, Role, RoleCount, Validator,
     },
     *,
@@ -114,6 +115,41 @@ pub async fn roles_count(client: &Client, address: &str, query: &QueryFilter) ->
         Ok(count) => Ok(count),
         Err(err) => Err(err),
     }
+}
+
+/// Fetches challenges that hotspots owned by the given account are involved in as a challenger, challengee, or witness.
+///
+/// ## Examples
+///
+/// ```
+///       use crate::*;
+///       use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::transactions::Challenge, models::QueryLimitWithTimeRange, IntoVec, Error};
+///       async fn get_challenges() -> Result<Vec<Challenge>, Error> {
+///         let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///         let challenges = accounts::challenges(
+///            &client,
+///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///            &QueryLimitWithTimeRange {
+///               min_time: Some("-7 day".into()),
+///               max_time: Some("now".into()),
+///               limit: Some(10)
+///            },
+///         )
+///         .into_vec()
+///         .await
+///         .expect("challenges");
+///         Ok(challenges)
+///       }
+/// ```
+///
+/// ## API Documentation
+/// Find more information about the API call under [`Challenges for Account`](https://docs.helium.com/api/blockchain/accounts).
+pub fn challenges(
+    client: &Client,
+    address: &str,
+    query: &QueryLimitWithTimeRange,
+) -> Stream<Challenge> {
+    client.fetch_stream(&format!("/accounts/{}/challenges", address), query)
 }
 
 #[cfg(test)]
@@ -322,5 +358,24 @@ mod test {
         assert!(roles_count.payment_v2 > Some(0));
         assert!(roles_count.rewards_v1 > Some(0));
         assert!(roles_count.rewards_v2 > Some(0));
+    }
+
+    #[test]
+    async fn challenges() {
+        let client = get_test_client();
+        let challenges = accounts::challenges(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryLimitWithTimeRange {
+                min_time: Some("-7 day".into()),
+                max_time: Some("-1 day".into()),
+                limit: Some(10),
+            },
+        )
+        .into_vec()
+        .await
+        .expect("challenges");
+
+        assert!(challenges.len() == 10);
     }
 }

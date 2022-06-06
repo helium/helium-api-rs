@@ -29,15 +29,15 @@ pub struct PathElement {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Geocode {
-    pub short_street: String,
-    pub short_state: String,
-    pub short_country: String,
-    pub short_city: String,
-    pub long_street: String,
-    pub long_state: String,
-    pub long_country: String,
-    pub long_city: String,
-    pub city_id: String,
+    pub short_street: Option<String>,
+    pub short_state: Option<String>,
+    pub short_country: Option<String>,
+    pub short_city: Option<String>,
+    pub long_street: Option<String>,
+    pub long_state: Option<String>,
+    pub long_country: Option<String>,
+    pub long_city: Option<String>,
+    pub city_id: Option<String>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
