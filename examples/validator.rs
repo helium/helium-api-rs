@@ -14,8 +14,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get Rewards
     if let Some(v) = validators.last() {
         let params = QueryTimeRange {
-            min_time: "-30 day".into(),
-            max_time: "-1 hour".into(),
+            min_time: Some("-30 day".into()),
+            max_time: Some("-1 hour".into()),
         };
         println!("Validator: {:?}", v);
         let rewards = validators::rewards(&client, &v.address, &params)

@@ -1,8 +1,9 @@
 use crate::{
     models::{
         transactions::{Challenge, Transaction},
-        Account, Hotspot, Oui, PendingTransaction, QueryFilter, QueryFilterWithTimeRange,
-        QueryLimitWithTimeRange, QueryTimeRange, Role, RoleCount, Validator,
+        Account, AccountReward, Hotspot, Oui, PendingTransaction, QueryFilter,
+        QueryFilterWithTimeRange, QueryLimitWithTimeRange, QueryTimeRange, Role, RoleCount,
+        Validator,
     },
     *,
 };
@@ -177,6 +178,34 @@ pub fn pending_transactions(client: &Client, address: &str) -> Stream<PendingTra
         &format!("/accounts/{}/pending_transactions", address),
         NO_QUERY,
     )
+}
+
+///Fetches the outstanding transactions for the given account. See Pending Transactions for details.
+///
+///## Examples
+///```
+///      use crate::*;
+///      use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::AccountReward, models::QueryTimeRange, IntoVec, Error};
+///      async fn get_rewards() -> Result<Vec<AccountReward>, Error> {
+///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///        let account_rewards = accounts::rewards(
+///           &client,
+///           "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///           &QueryTimeRange {
+///                min_time: Some("-7 day".into()),
+///                max_time: Some("-1 day".into()),
+///            }
+///        )
+///        .into_vec()
+///        .await
+///        .expect("account rewards");
+///        Ok(account_rewards)
+///      }
+///```
+///## API Documentation
+///Find more information about the API call under [`Rewards for an Account`](https://docs.helium.com/api/blockchain/accounts).
+pub fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<AccountReward> {
+    client.fetch_stream(&format!("/accounts/{}/rewards", address), query)
 }
 
 #[cfg(test)]
@@ -418,5 +447,23 @@ mod test {
         .expect("pending transactions");
 
         assert!(pending_transactions.len() > 0);
+    }
+
+    #[test]
+    async fn rewards() {
+        let client = get_test_client();
+        let rewards = accounts::rewards(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryTimeRange {
+                min_time: Some("-7 day".into()),
+                max_time: Some("-1 day".into()),
+            },
+        )
+        .into_vec()
+        .await
+        .expect("rewards");
+
+        assert!(rewards.len() > 0);
     }
 }

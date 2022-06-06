@@ -82,3 +82,14 @@ pub struct RoleCount {
     pub state_channel_close_v1: Option<u64>,
     pub redeem_htlc_v1: Option<u64>,
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AccountReward {
+    r#type: Option<String>,
+    timestamp: String,
+    hash: String,
+    gateway: String,
+    block: u64,
+    amount: Hnt,
+    account: String,
+}

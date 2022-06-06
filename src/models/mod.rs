@@ -25,9 +25,9 @@ pub use values::*;
 #[derive(Clone, Debug, Serialize)]
 pub struct QueryTimeRange {
     /// ISO 8601 timestamp or relative time (-3 hour) minimum time range
-    pub min_time: String,
+    pub min_time: Option<String>,
     /// ISO 8601 timestamp or relative time (-3 hour) maximum time range
-    pub max_time: String,
+    pub max_time: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
