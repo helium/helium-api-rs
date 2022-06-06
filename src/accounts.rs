@@ -208,6 +208,36 @@ pub fn rewards(client: &Client, address: &str, query: &QueryTimeRange) -> Stream
     client.fetch_stream(&format!("/accounts/{}/rewards", address), query)
 }
 
+///Returns rewards for a given account for a given block.
+///
+/// The result includes a `type` field which is the type of activity that generated the reward.
+///
+///## Examples
+///```
+///      use crate::*;
+///      use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::AccountReward, models::QueryTimeRange, IntoVec, Error};
+///      async fn get_rewards_at_block() -> Result<Vec<AccountReward>, Error> {
+///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///        let account_rewards = accounts::rewards_at_block(
+///           &client,
+///           "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///           1342108
+///        )
+///        .into_vec()
+///        .await
+///        .expect("account rewards_at_block");
+///        Ok(account_rewards)
+///      }
+///```
+///## API Documentation
+///Find more information about the API call under [`Rewards in a Rewards Block for an Account`](https://docs.helium.com/api/blockchain/accounts).
+pub fn rewards_at_block(client: &Client, address: &str, block: u64) -> Stream<AccountReward> {
+    client.fetch_stream(
+        &format!("/accounts/{}/rewards/{}", address, block),
+        NO_QUERY,
+    )
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -465,5 +495,21 @@ mod test {
         .expect("rewards");
 
         assert!(rewards.len() > 0);
+    }
+
+    #[test]
+    async fn rewards_at_block() {
+        let client = get_test_client();
+        let rewards = accounts::rewards_at_block(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            1342108,
+        )
+        .into_vec()
+        .await
+        .expect("rewards");
+
+        assert!(rewards.len() > 0);
+        assert!(rewards[0].block == 1342108);
     }
 }

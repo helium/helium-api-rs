@@ -85,11 +85,11 @@ pub struct RoleCount {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct AccountReward {
-    r#type: Option<String>,
-    timestamp: String,
-    hash: String,
-    gateway: String,
-    block: u64,
-    amount: Hnt,
-    account: String,
+    pub r#type: Option<String>,
+    pub timestamp: String,
+    pub hash: String,
+    pub gateway: String,
+    pub block: u64,
+    pub amount: Hnt,
+    pub account: String,
 }
