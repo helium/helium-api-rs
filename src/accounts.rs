@@ -1,8 +1,8 @@
 use crate::{
     models::{
         transactions::{Challenge, Transaction},
-        Account, Hotspot, Oui, QueryFilter, QueryFilterWithTimeRange, QueryLimitWithTimeRange,
-        QueryTimeRange, Role, RoleCount, Validator,
+        Account, Hotspot, Oui, PendingTransaction, QueryFilter, QueryFilterWithTimeRange,
+        QueryLimitWithTimeRange, QueryTimeRange, Role, RoleCount, Validator,
     },
     *,
 };
@@ -150,6 +150,33 @@ pub fn challenges(
     query: &QueryLimitWithTimeRange,
 ) -> Stream<Challenge> {
     client.fetch_stream(&format!("/accounts/{}/challenges", address), query)
+}
+
+/// Fetches the outstanding transactions for the given account. See Pending Transactions for details.
+///
+/// ## Examples
+/// ```
+///       use crate::*;
+///       use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::PendingTransaction, models::QueryLimitWithTimeRange, IntoVec, Error};
+///       async fn get_pending_transactions() -> Result<Vec<PendingTransaction>, Error> {
+///         let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///         let pending_transactions = accounts::pending_transactions(
+///            &client,
+///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///         )
+///         .into_vec()
+///         .await
+///         .expect("pending_transactions");
+///         Ok(pending_transactions)
+///       }
+/// ```
+/// ## API Documentation
+/// Find more information about the API call under [`Pending Transactions for Account`](https://docs.helium.com/api/blockchain/accounts).
+pub fn pending_transactions(client: &Client, address: &str) -> Stream<PendingTransaction> {
+    client.fetch_stream(
+        &format!("/accounts/{}/pending_transactions", address),
+        NO_QUERY,
+    )
 }
 
 #[cfg(test)]
@@ -377,5 +404,19 @@ mod test {
         .expect("challenges");
 
         assert!(challenges.len() == 10);
+    }
+
+    #[test]
+    async fn pending_transactions() {
+        let client = get_test_client();
+        let pending_transactions = accounts::pending_transactions(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+        )
+        .into_vec()
+        .await
+        .expect("pending transactions");
+
+        assert!(pending_transactions.len() > 0);
     }
 }

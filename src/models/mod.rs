@@ -6,6 +6,7 @@ mod geocode;
 mod hotspot;
 mod oracle;
 mod oui;
+mod pending_transaction;
 pub mod transactions;
 mod validator;
 mod values;
@@ -16,6 +17,7 @@ pub use geocode::*;
 pub use hotspot::*;
 pub use oracle::*;
 pub use oui::*;
+pub use pending_transaction::*;
 pub use validator::*;
 pub use values::*;
 
