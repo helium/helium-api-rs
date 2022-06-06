@@ -286,6 +286,7 @@ pub async fn rewards_sum(
     address: &str,
     query: &QueryBucketWithTimeRange,
 ) -> Result<Vec<AccountRewardsTotals>> {
+    //TODO: Don't think this is the best aproach to do this, but it works for now.
     if query.bucket.is_none() {
         let rewards_total: Result<AccountRewardsTotals> = client
             .fetch(&format!("/accounts/{}/rewards/sum", address), query)
