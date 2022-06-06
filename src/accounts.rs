@@ -52,8 +52,12 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
 /// ## Examples
 ///
 /// ```
-///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
-///        let roles = accounts::roles(
+///       use crate::*;
+///       use helium_api::{Client, DEFAULT_BASE_URL, models::Role, accounts, models::QueryFilterWithTimeRange, IntoVec, Error};
+///       
+///       async fn get_roles() -> Result<Vec<Role>, Error> {
+///         let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///         let roles = accounts::roles(
 ///            &client,
 ///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
 ///            &QueryFilterWithTimeRange {
@@ -62,10 +66,11 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
 ///                max_time: Some("2022-06-06T00:00:00Z".to_string()),
 ///                limit: Some(10),
 ///            },
-///        )
-///        .into_vec()
-///        .await
-///        .expect("role list");
+///         )
+///         .into_vec()
+///         .await;
+///         Ok(roles.unwrap())
+///       }
 /// ```
 ///
 /// ## API Documentation
@@ -79,8 +84,12 @@ pub fn roles(client: &Client, address: &str, query: &QueryFilterWithTimeRange) -
 /// ## Examples
 ///
 /// ```
-///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
-///        let roles_count = accounts::roles_count(
+///       use crate::*;
+///       use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::RoleCount, models::QueryFilter};
+///       use core::fmt::Error;
+///       async fn get_roles_count() -> Result<RoleCount, Error> {
+///         let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///         let roles_count = accounts::roles_count(
 ///            &client,
 ///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
 ///            &QueryFilter {
@@ -88,9 +97,11 @@ pub fn roles(client: &Client, address: &str, query: &QueryFilterWithTimeRange) -
 ///                    "assert_location_v2,rewards_v1,rewards_v2,payment_v2".to_string(),
 ///                ),
 ///            },
-///        )
-///        .await
-///        .expect("role count");
+///         )
+///         .await
+///         .expect("role count");
+///         Ok(roles_count)
+///       }
 /// ```
 ///
 /// ## API Documentation
