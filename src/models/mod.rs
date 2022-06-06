@@ -37,3 +37,8 @@ pub struct QueryFilterWithTimeRange {
     pub filter_types: Option<String>,
     pub limit: Option<u64>,
 }
+
+#[derive(Clone, Debug, Serialize)]
+pub struct QueryFilter {
+    pub filter_types: Option<String>,
+}

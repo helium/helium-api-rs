@@ -1,7 +1,7 @@
 use crate::{
     models::{
-        transactions::Transaction, Account, Hotspot, Oui, QueryFilterWithTimeRange, QueryTimeRange,
-        Role, Validator,
+        transactions::Transaction, Account, Hotspot, Oui, QueryFilter, QueryFilterWithTimeRange,
+        QueryTimeRange, Role, RoleCount, Validator,
     },
     *,
 };
@@ -72,6 +72,37 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
 /// Find more information about the API call under [`Roles for Account`](https://docs.helium.com/api/blockchain/accounts).
 pub fn roles(client: &Client, address: &str, query: &QueryFilterWithTimeRange) -> Stream<Role> {
     client.fetch_stream(&format!("/accounts/{}/roles", address), query)
+}
+
+/// Returns the roles count for an account
+///
+/// ## Examples
+///
+/// ```
+///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///        let roles_count = accounts::roles_count(
+///            &client,
+///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///            &QueryFilter {
+///                filter_types: Some(
+///                    "assert_location_v2,rewards_v1,rewards_v2,payment_v2".to_string(),
+///                ),
+///            },
+///        )
+///        .await
+///        .expect("role count");
+/// ```
+///
+/// ## API Documentation
+/// Find more information about the API call under [`Roles Counts for Account`](https://docs.helium.com/api/blockchain/accounts).
+pub async fn roles_count(client: &Client, address: &str, query: &QueryFilter) -> Result<RoleCount> {
+    let count = client
+        .fetch(&format!("/accounts/{}/roles/count", address), query)
+        .await;
+    match count {
+        Ok(count) => Ok(count),
+        Err(err) => Err(err),
+    }
 }
 
 #[cfg(test)]
@@ -181,5 +212,104 @@ mod test {
             assert_eq!(role.role_type, "rewards_v2");
         });
         assert!(roles.len() == 10);
+    }
+
+    #[test]
+    async fn roles_count() {
+        let client = get_test_client();
+        let roles_count = accounts::roles_count(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryFilter { filter_types: None },
+        )
+        .await
+        .expect("role count");
+
+        assert!(roles_count.vars_v1 >= Some(0));
+        assert!(roles_count.gen_validator_v1 >= Some(0));
+        assert!(roles_count.price_oracle_v1 >= Some(0));
+        assert!(roles_count.security_exchange_v1 >= Some(0));
+        assert!(roles_count.gen_gateway_v1 >= Some(0));
+        assert!(roles_count.consensus_group_v1 >= Some(0));
+        assert!(roles_count.token_burn_exchange_rate_v1 >= Some(0));
+        assert!(roles_count.transfer_hotspot_v2 >= Some(0));
+        assert!(roles_count.poc_receipts_v1 >= Some(0));
+        assert!(roles_count.validator_heartbeat_v1 >= Some(0));
+        assert!(roles_count.create_htlc_v1 >= Some(0));
+        assert!(roles_count.transfer_validator_stake_v1 >= Some(0));
+        assert!(roles_count.stake_validator_v1 >= Some(0));
+        assert!(roles_count.routing_v1 >= Some(0));
+        assert!(roles_count.poc_request_v1 >= Some(0));
+        assert!(roles_count.payment_v1 >= Some(0));
+        assert!(roles_count.assert_location_v2 > Some(0));
+        assert!(roles_count.security_coinbase_v1 >= Some(0));
+        assert!(roles_count.assert_location_v1 > Some(0));
+        assert!(roles_count.token_burn_v1 >= Some(0));
+        assert!(roles_count.rewards_v1 > Some(0));
+        assert!(roles_count.unstake_validator_v1 >= Some(0));
+        assert!(roles_count.oui_v1 >= Some(0));
+        assert!(roles_count.state_channel_open_v1 >= Some(0));
+        assert!(roles_count.rewards_v2 > Some(0));
+        assert!(roles_count.coinbase_v1 >= Some(0));
+        assert!(roles_count.add_gateway_v1 >= Some(0));
+        assert!(roles_count.poc_receipts_v2 >= Some(0));
+        assert!(roles_count.consensus_group_failure_v1 >= Some(0));
+        assert!(roles_count.payment_v2 > Some(0));
+        assert!(roles_count.transfer_hotspot_v1 >= Some(0));
+        assert!(roles_count.dc_coinbase_v1 >= Some(0));
+        assert!(roles_count.state_channel_close_v1 >= Some(0));
+        assert!(roles_count.redeem_htlc_v1 >= Some(0));
+    }
+
+    #[test]
+    async fn roles_count_filter() {
+        let client = get_test_client();
+        let roles_count = accounts::roles_count(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryFilter {
+                filter_types: Some(
+                    "assert_location_v2,rewards_v1,rewards_v2,payment_v2".to_string(),
+                ),
+            },
+        )
+        .await
+        .expect("role count");
+
+        assert!(roles_count.vars_v1 == None);
+        assert!(roles_count.gen_validator_v1 == None);
+        assert!(roles_count.price_oracle_v1 == None);
+        assert!(roles_count.security_exchange_v1 == None);
+        assert!(roles_count.gen_gateway_v1 == None);
+        assert!(roles_count.consensus_group_v1 == None);
+        assert!(roles_count.token_burn_exchange_rate_v1 == None);
+        assert!(roles_count.transfer_hotspot_v2 == None);
+        assert!(roles_count.poc_receipts_v1 == None);
+        assert!(roles_count.validator_heartbeat_v1 == None);
+        assert!(roles_count.create_htlc_v1 == None);
+        assert!(roles_count.transfer_validator_stake_v1 == None);
+        assert!(roles_count.stake_validator_v1 == None);
+        assert!(roles_count.routing_v1 == None);
+        assert!(roles_count.poc_request_v1 == None);
+        assert!(roles_count.payment_v1 == None);
+        assert!(roles_count.security_coinbase_v1 == None);
+        assert!(roles_count.assert_location_v1 == None);
+        assert!(roles_count.token_burn_v1 == None);
+        assert!(roles_count.unstake_validator_v1 == None);
+        assert!(roles_count.oui_v1 == None);
+        assert!(roles_count.state_channel_open_v1 == None);
+        assert!(roles_count.coinbase_v1 == None);
+        assert!(roles_count.add_gateway_v1 == None);
+        assert!(roles_count.poc_receipts_v2 == None);
+        assert!(roles_count.consensus_group_failure_v1 == None);
+        assert!(roles_count.transfer_hotspot_v1 == None);
+        assert!(roles_count.dc_coinbase_v1 == None);
+        assert!(roles_count.state_channel_close_v1 == None);
+        assert!(roles_count.redeem_htlc_v1 == None);
+
+        assert!(roles_count.assert_location_v2 > Some(0));
+        assert!(roles_count.payment_v2 > Some(0));
+        assert!(roles_count.rewards_v1 > Some(0));
+        assert!(roles_count.rewards_v2 > Some(0));
     }
 }
