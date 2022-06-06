@@ -1,9 +1,9 @@
 use crate::{
     models::{
         transactions::{Challenge, Transaction},
-        Account, AccountReward, Hotspot, Oui, PendingTransaction, QueryFilter,
-        QueryFilterWithTimeRange, QueryLimitWithTimeRange, QueryTimeRange, Role, RoleCount,
-        Validator,
+        Account, AccountReward, AccountRewardsTotals, Hotspot, Oui, PendingTransaction,
+        QueryBucketWithTimeRange, QueryFilter, QueryFilterWithTimeRange, QueryLimitWithTimeRange,
+        QueryTimeRange, Role, RoleCount, Validator,
     },
     *,
 };
@@ -248,8 +248,67 @@ pub fn rewards_at_block(client: &Client, address: &str, block: u64) -> Stream<Ac
     )
 }
 
+///Returns the total rewards for a given account in a given timeframe. Timestamps can be given in ISO 8601 format (e.g. `2020-08-27T00:00:00Z`) or in relative time (e.g. `-1 week`, which when url esacped becomes `-1%20week`). When ommitted the current time is assumed.
+///
+///The results can also be bucketed in time by specifying a `bucket` query parameter which buckets information per bucket in the given timeframe. Data is bucketed per hotspot and time for the account to make hotspot performance comparison possible. Valid bucket values include `hour`, `day` and `week`).
+///
+///For example to get the last 7 days of rewards bucketed by day use the following path/parameters: `?min_time=-7%20day&bucket=day`
+///
+///#### Note
+///The block that contains the `max_time` timestamp is excluded from the result.
+///
+///## Examples
+///```
+///      use crate::*;
+///      use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::AccountRewardsTotals, models::QueryBucketWithTimeRange, models::BucketType, IntoVec, Error};
+///
+///      async fn get_rewards_sum() -> Result<Vec<AccountRewardsTotals>, Error> {
+///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///        let rewards_sum = accounts::rewards_sum(
+///            &client,
+///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///            &QueryBucketWithTimeRange {
+///                min_time: Some("-7 day".into()),
+///                max_time: Some("-1 day".into()),
+///                bucket: Some(BucketType::Hour),
+///            },
+///        )
+///        .await
+///       .expect("account rewards_sum");
+///
+///        Ok(rewards_sum)
+///      }
+///```
+///## API Documentation
+///Find more information about the API call under [`Reward Totals for an Account`](https://docs.helium.com/api/blockchain/accounts).
+pub async fn rewards_sum(
+    client: &Client,
+    address: &str,
+    query: &QueryBucketWithTimeRange,
+) -> Result<Vec<AccountRewardsTotals>> {
+    if query.bucket.is_none() {
+        let rewards_total: Result<AccountRewardsTotals> = client
+            .fetch(&format!("/accounts/{}/rewards/sum", address), query)
+            .await;
+        match rewards_total {
+            Ok(rewards_total) => Ok([rewards_total].to_vec()),
+            Err(e) => Err(e),
+        }
+    } else {
+        let rewards_total = client
+            .fetch(&format!("/accounts/{}/rewards/sum", address), query)
+            .await;
+        match rewards_total {
+            Ok(rewards_total) => Ok(rewards_total),
+            Err(e) => Err(e),
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
+    use crate::models::BucketType;
+
     use super::*;
     use tokio::test;
 
@@ -521,5 +580,43 @@ mod test {
 
         assert!(rewards.len() > 0);
         assert!(rewards[0].block == 1342108);
+    }
+
+    #[test]
+    async fn rewards_sum_no_bucket() {
+        let client = get_test_client();
+        let rewards_sum = accounts::rewards_sum(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryBucketWithTimeRange {
+                min_time: Some("-7 day".into()),
+                max_time: Some("-1 day".into()),
+                bucket: None,
+            },
+        )
+        .await
+        .expect("rewards_sum_no_bucket");
+
+        assert!(rewards_sum.len() == 1);
+        assert!(rewards_sum[0].timestamp == None);
+    }
+
+    #[test]
+    async fn rewards_sum_with_bucket() {
+        let client = get_test_client();
+        let rewards_sum = accounts::rewards_sum(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+            &QueryBucketWithTimeRange {
+                min_time: Some("-7 day".into()),
+                max_time: Some("-1 day".into()),
+                bucket: Some(BucketType::Hour),
+            },
+        )
+        .await
+        .expect("rewards_sum_with_bucket");
+
+        assert!(rewards_sum.len() > 0);
+        assert!(rewards_sum[0].timestamp != None);
     }
 }

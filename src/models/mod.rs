@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 mod account;
 mod block;
@@ -52,4 +52,21 @@ pub struct QueryLimitWithTimeRange {
     /// ISO 8601 timestamp or relative time (-3 hour) maximum time range
     pub max_time: Option<String>,
     pub limit: Option<u64>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+pub enum BucketType {
+    Hour,
+    Day,
+    Week,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct QueryBucketWithTimeRange {
+    /// ISO 8601 timestamp or relative time (-3 hour) minimum time range
+    pub min_time: Option<String>,
+    /// ISO 8601 timestamp or relative time (-3 hour) maximum time range
+    pub max_time: Option<String>,
+    pub bucket: Option<BucketType>,
 }

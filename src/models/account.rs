@@ -93,3 +93,15 @@ pub struct AccountReward {
     pub amount: Hnt,
     pub account: String,
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AccountRewardsTotals {
+    pub total: f64,
+    pub sum: Hnt,
+    pub stddev: f64,
+    pub min: f64,
+    pub median: f64,
+    pub max: f64,
+    pub avg: f64,
+    pub timestamp: Option<String>,
+}
