@@ -52,7 +52,7 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
 /// ## Examples
 ///
 /// ```
-///        let client = get_test_client();
+///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
 ///        let roles = accounts::roles(
 ///            &client,
 ///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
