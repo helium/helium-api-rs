@@ -1,9 +1,9 @@
 use crate::{
     models::{
         transactions::{Challenge, Transaction},
-        Account, AccountReward, AccountRewardsTotals, Hotspot, Oui, PendingTransaction,
-        QueryBucketWithTimeRange, QueryFilter, QueryFilterWithTimeRange, QueryLimitWithTimeRange,
-        QueryTimeRange, Role, RoleCount, Validator,
+        Account, AccountReward, AccountRewardsTotals, AccountStats, Hotspot, Oui,
+        PendingTransaction, QueryBucketWithTimeRange, QueryFilter, QueryFilterWithTimeRange,
+        QueryLimitWithTimeRange, QueryTimeRange, Role, RoleCount, Validator,
     },
     *,
 };
@@ -306,11 +306,40 @@ pub async fn rewards_sum(
     }
 }
 
+///Fetches account statistics for a given account. This currently includes account balance information (in bones) for the last month (daily), last week (every 8 hours), and daily (hourly).
+///
+///## Examples
+///```
+///      use crate::*;
+///      use helium_api::{Client, DEFAULT_BASE_URL, accounts, models::AccountStats};
+///      use core::fmt::Error;
+///
+///      async fn get_stats() -> Result<AccountStats, Error> {
+///        let client = Client::new_with_base_url(DEFAULT_BASE_URL.to_string(), "helium-api-rs/example");
+///        let stats = accounts::stats(
+///            &client,
+///            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+///        )
+///        .await
+///        .expect("stats");
+///
+///        Ok(stats)
+///      }
+///```
+///## API Documentation
+///Find more information about the API call under [`Stats for Account`](https://docs.helium.com/api/blockchain/accounts).
+pub async fn stats(client: &Client, address: &str) -> Result<AccountStats> {
+    client
+        .fetch(&format!("/accounts/{}/stats", address), NO_QUERY)
+        .await
+}
+
 #[cfg(test)]
 mod test {
     use crate::models::BucketType;
 
     use super::*;
+    use rust_decimal::Decimal;
     use tokio::test;
 
     #[test]
@@ -619,5 +648,23 @@ mod test {
 
         assert!(rewards_sum.len() > 0);
         assert!(rewards_sum[0].timestamp != None);
+    }
+
+    #[test]
+    async fn stats() {
+        let client = get_test_client();
+        let stats = accounts::stats(
+            &client,
+            "13WRNw4fmssJBvMqMnREwe1eCvUVXfnWXSXGcWXyVvAnQUF3D9R",
+        )
+        .await
+        .expect("stats");
+
+        assert!(stats.last_day.len() > 0);
+        assert!(stats.last_day[0].balance.get_decimal() > Decimal::new(0, 8));
+        assert!(stats.last_week.len() > 0);
+        assert!(stats.last_week[0].balance.get_decimal() > Decimal::new(0, 8));
+        assert!(stats.last_month.len() > 0);
+        assert!(stats.last_month[0].balance.get_decimal() > Decimal::new(0, 8));
     }
 }

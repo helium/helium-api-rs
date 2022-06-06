@@ -105,3 +105,17 @@ pub struct AccountRewardsTotals {
     pub avg: f64,
     pub timestamp: Option<String>,
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AccountStats {
+    pub last_day: Vec<StatsMeasures>,
+    pub last_month: Vec<StatsMeasures>,
+    pub last_week: Vec<StatsMeasures>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct StatsMeasures {
+    #[serde(deserialize_with = "Hnt::deserialize")]
+    pub balance: Hnt,
+    pub timestamp: String,
+}
