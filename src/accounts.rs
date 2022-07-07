@@ -44,6 +44,7 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
 }
 
+/// Fetch all pending transactions for an account
 pub fn pending(client: &Client, address: &str) -> Stream<Transaction> {
     client.fetch_stream(
         &format!("/accounts/{}/pending_transactions", address),
