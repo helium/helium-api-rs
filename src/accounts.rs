@@ -44,6 +44,13 @@ pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Strea
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
 }
 
+pub fn pending(client: &Client, address: &str) -> Stream<Transaction> {
+    client.fetch_stream(
+        &format!("/accounts/{}/pending_transactions", address),
+        NO_QUERY,
+    )
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
