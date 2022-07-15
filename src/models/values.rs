@@ -116,7 +116,7 @@ macro_rules! decimal_scalar {
 decimal_scalar!(Hnt, 100_000_000, 8);
 decimal_scalar!(Hst, 100_000_000, 8);
 decimal_scalar!(Iot, 100_000_000, 8);
-decimal_scalar!(Mob, 100_000_000, 8);
+decimal_scalar!(Mobile, 100_000_000, 8);
 decimal_scalar!(Generic, 100_000_000, 8);
 decimal_scalar!(Usd, 100_000_000, 8);
 decimal_scalar!(Dbi, 10, 1);

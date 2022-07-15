@@ -1,4 +1,4 @@
-use super::{Hnt, Hst, Iot, Mob};
+use super::{Hnt, Hst, Iot, Mobile};
 
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +26,7 @@ pub struct Account {
     /// The latest IOT balance of the wallet at block height
     pub iot_balance: Iot,
     /// The latest MOB balance of the wallet at block height
-    pub mobile_balance: Mob,
+    pub mobile_balance: Mobile,
     /// The current sec_nonce for the account
     pub sec_nonce: u64,
     /// The current dc_nonce for the account
