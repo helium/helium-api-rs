@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct TransferValidatorStakeV1 {
-    pub block: u64,
     pub fee: u64,
     pub hash: String,
     pub new_address: String,
