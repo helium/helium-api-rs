@@ -23,8 +23,10 @@ pub struct Account {
     pub sec_balance: Hst,
     /// The current nonce for the account
     pub nonce: u64,
+    #[serde(default = "default_iot")]
     /// The latest IOT balance of the wallet at block height
     pub iot_balance: Iot,
+    #[serde(default = "default_mobile")]
     /// The latest MOB balance of the wallet at block height
     pub mobile_balance: Mobile,
     /// The current sec_nonce for the account
@@ -37,4 +39,12 @@ pub struct Account {
     /// The speculative security nonce for the account
     #[serde(default)]
     pub speculative_sec_nonce: u64,
+}
+
+fn default_iot() -> Iot {
+    Iot::from(0)
+}
+
+fn default_mobile() -> Mobile {
+    Mobile::from(0)
 }
