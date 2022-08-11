@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 macro_rules! decimal_scalar {
     ($stype:ident, $scalar:literal, $scale:literal) => {
-        #[derive(Clone, Copy, Debug, PartialEq)]
+        #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
         pub struct $stype(Decimal);
 
         impl FromStr for $stype {
@@ -115,6 +115,9 @@ macro_rules! decimal_scalar {
 
 decimal_scalar!(Hnt, 100_000_000, 8);
 decimal_scalar!(Hst, 100_000_000, 8);
+decimal_scalar!(Iot, 100_000_000, 8);
+decimal_scalar!(Mobile, 100_000_000, 8);
+decimal_scalar!(Token, 100_000_000, 8);
 decimal_scalar!(Usd, 100_000_000, 8);
 decimal_scalar!(Dbi, 10, 1);
 

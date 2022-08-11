@@ -1,4 +1,4 @@
-use super::{Hnt, Hst};
+use super::{Hnt, Hst, Iot, Mobile};
 
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ pub struct Account {
     /// Block height of the API when query was made. When null, there
     /// is no on-chain record of this account.
     pub block: Option<u64>,
-    /// The latest balance of the wallet at block height
+    /// The latest HNT balance of the wallet at block height
     pub balance: Hnt,
     /// The latest staked_balance of the wallet at block height
     #[serde(deserialize_with = "Hnt::deserialize")]
@@ -23,6 +23,12 @@ pub struct Account {
     pub sec_balance: Hst,
     /// The current nonce for the account
     pub nonce: u64,
+    #[serde(default)]
+    /// The latest IOT balance of the wallet at block height
+    pub iot_balance: Iot,
+    #[serde(default)]
+    /// The latest MOB balance of the wallet at block height
+    pub mobile_balance: Mobile,
     /// The current sec_nonce for the account
     pub sec_nonce: u64,
     /// The current dc_nonce for the account
