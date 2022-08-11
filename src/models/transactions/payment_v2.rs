@@ -11,7 +11,7 @@ pub struct PaymentV2 {
     pub payments: Vec<PaymentV2Payment>,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Debug)]
 #[serde(tag = "token_type", rename_all = "snake_case")]
 pub enum PaymentV2Payment {
     Iot(IotPayment),
@@ -34,6 +34,64 @@ payment!(HstPayment, Hst);
 payment!(IotPayment, Iot);
 payment!(HntPayment, Hnt);
 payment!(MobilePayment, Mobile);
+
+use serde::Deserializer;
+
+impl<'de> Deserialize<'de> for PaymentV2Payment {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(rename_all = "snake_case")]
+        enum Type {
+            Iot,
+            Hnt,
+            Hst,
+            Mobile,
+        }
+
+        #[derive(Deserialize)]
+        struct Inner {
+            pub token_type: Option<Type>,
+            pub amount: u64,
+            pub memo: Option<String>,
+            pub payee: String,
+        }
+
+        let i: Inner = Inner::deserialize(deserializer)?;
+
+        Ok(match i.token_type {
+            None => PaymentV2Payment::Hnt(HntPayment {
+                amount: Hnt::from(i.amount),
+                memo: i.memo,
+                payee: i.payee,
+            }),
+            Some(tag) => match tag {
+                Type::Iot => PaymentV2Payment::Iot(IotPayment {
+                    amount: Iot::from(i.amount),
+                    memo: i.memo,
+                    payee: i.payee,
+                }),
+                Type::Hnt => PaymentV2Payment::Hnt(HntPayment {
+                    amount: Hnt::from(i.amount),
+                    memo: i.memo,
+                    payee: i.payee,
+                }),
+                Type::Hst => PaymentV2Payment::Hst(HstPayment {
+                    amount: Hst::from(i.amount),
+                    memo: i.memo,
+                    payee: i.payee,
+                }),
+                Type::Mobile => PaymentV2Payment::Mobile(MobilePayment {
+                    amount: Mobile::from(i.amount),
+                    memo: i.memo,
+                    payee: i.payee,
+                }),
+            },
+        })
+    }
+}
 
 #[cfg(test)]
 mod tests {
