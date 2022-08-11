@@ -99,10 +99,30 @@ mod tests {
     use std::str::FromStr;
 
     #[test]
-    fn deser_json_hnt() {
+    fn deser_json_hst() {
         let json_str = "\
         {\
-            \"token_type\": \"hnt\",\
+            \"token_type\": \"hst\",\
+            \"payee\": \"1bdkwatM2APjn5cvo7eKiJGidoHAKJsHg8ReeguH49dtLacK6cR\",\
+            \"memo\": \"HNTAAAAAAAA=\",\
+            \"max\": false,\
+            \"amount\": 160000000\
+          }\
+        ";
+        let hnt_payment: PaymentV2Payment =
+            serde_json::from_str(json_str).expect("hst_payment deserialization");
+        if let PaymentV2Payment::Hst(hst) = hnt_payment {
+            assert_eq!(hst.amount, Hst::from_str("1.6").expect("HST"));
+        } else {
+            assert!(false)
+        }
+    }
+
+    #[test]
+    fn deser_json_hnt() {
+        // when no token_type is given, we default to HNT
+        let json_str = "\
+        {\
             \"payee\": \"1bdkwatM2APjn5cvo7eKiJGidoHAKJsHg8ReeguH49dtLacK6cR\",\
             \"memo\": \"HNTAAAAAAAA=\",\
             \"max\": false,\
