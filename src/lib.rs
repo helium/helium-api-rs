@@ -135,6 +135,20 @@ impl Client {
             .boxed()
     }
 
+    pub(crate) async fn fetch_etl_to_native<T, E, Q>(
+        &self,
+        path: &str,
+        query: &Q,
+    ) -> error::Result<T>
+    where
+        T: 'static + DeserializeOwned + Send + From<E>,
+        E: 'static + DeserializeOwned + Send,
+        Q: Serialize + ?Sized,
+    {
+        let result: Data<E> = self.fetch_data(path, query).await?;
+        Ok(result.data.into())
+    }
+
     pub(crate) async fn fetch<T, Q>(&self, path: &str, query: &Q) -> error::Result<T>
     where
         T: 'static + DeserializeOwned + std::marker::Send,

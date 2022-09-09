@@ -21,13 +21,18 @@ macro_rules! decimal_scalar {
             }
         }
 
+        impl fmt::Display for $stype {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                self.0.fmt(f)
+            }
+        }
+
         impl Serialize for $stype {
             fn serialize<S>(&self, s: S) -> std::result::Result<S::Ok, S::Error>
             where
                 S: Serializer,
             {
-                let u: u64 = u64::from(*self);
-                s.serialize_u64(u)
+                rust_decimal::serde::float::serialize(&self.0, s)
             }
         }
 
@@ -36,14 +41,7 @@ macro_rules! decimal_scalar {
             where
                 D: Deserializer<'de>,
             {
-                let val = u64::deserialize(d)?;
-                Ok(Self::from(val))
-            }
-        }
-
-        impl fmt::Display for $stype {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                self.0.fmt(f)
+                Ok(Self(rust_decimal::serde::float::deserialize(d)?))
             }
         }
 
@@ -66,6 +64,22 @@ macro_rules! decimal_scalar {
                 } else {
                     Ok(None)
                 }
+            }
+
+            pub fn serialize_u64<S>(&self, s: S) -> std::result::Result<S::Ok, S::Error>
+            where
+                S: Serializer,
+            {
+                let u: u64 = u64::from(*self);
+                s.serialize_u64(u)
+            }
+
+            pub fn deserialize_u64<'de, D>(d: D) -> std::result::Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                let val = u64::deserialize(d)?;
+                Ok(Self::from(val))
             }
         }
 
@@ -130,7 +144,6 @@ mod tests {
     #[test]
     fn test_ser_hnt() {
         let hnt = Hnt::from(5500);
-
-        assert_tokens(&hnt, &[Token::U64(5500)]);
+        assert_tokens(&hnt, &[Token::F64(5.5e-5)]);
     }
 }

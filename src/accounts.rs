@@ -1,5 +1,7 @@
 use crate::{
-    models::{transactions::Transaction, Account, Hotspot, Oui, QueryTimeRange, Validator},
+    models::{
+        transactions::Transaction, Account, AccountEtl, Hotspot, Oui, QueryTimeRange, Validator,
+    },
     *,
 };
 
@@ -11,7 +13,7 @@ pub fn all(client: &Client) -> Stream<Account> {
 /// Get a specific account by its address
 pub async fn get(client: &Client, address: &str) -> Result<Account> {
     client
-        .fetch(&format!("/accounts/{}", address), NO_QUERY)
+        .fetch_etl_to_native::<Account, AccountEtl, _>(&format!("/accounts/{}", address), NO_QUERY)
         .await
 }
 
