@@ -74,20 +74,6 @@ macro_rules! decimal_scalar {
                     Ok(None)
                 }
             }
-
-            pub fn serialize_to_float<S>(&self, s: S) -> std::result::Result<S::Ok, S::Error>
-            where
-                S: Serializer,
-            {
-                rust_decimal::serde::float::serialize(&self.0, s)
-            }
-
-            pub fn deserialize_from_float<'de, D>(d: D) -> std::result::Result<Self, D::Error>
-            where
-                D: Deserializer<'de>,
-            {
-                Ok(Self(rust_decimal::serde::float::deserialize(d)?))
-            }
         }
 
         impl From<u64> for $stype {
