@@ -56,6 +56,13 @@ macro_rules! decimal_scalar {
                 self.0
             }
 
+            pub fn to_f64(&self) -> f64 {
+                // The rust_decimal crate unwraps like this when implementing serde-with-float.
+                // Presumably, to_f64() would never return none.
+                use num_traits::ToPrimitive;
+                self.0.to_f64().unwrap()
+            }
+
             pub fn deserialize_option<'de, D>(d: D) -> std::result::Result<Option<Self>, D::Error>
             where
                 D: Deserializer<'de>,
