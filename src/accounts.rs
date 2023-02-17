@@ -1,5 +1,8 @@
 use crate::{
-    models::{transactions::Transaction, Account, Hotspot, Oui, QueryTimeRange, Validator},
+    models::{
+        transactions::{ProcessedTransaction, RoleTransaction},
+        Account, Hotspot, Oui, QueryTimeRange, Validator,
+    },
     *,
 };
 
@@ -40,8 +43,18 @@ pub async fn richest(client: &Client, limit: Option<u32>) -> Result<Vec<Account>
 
 /// Fetches transactions that indicate activity for an account. This includes any
 /// transaction that involves the account, usually as a payer, payee or owner.
-pub fn activity(client: &Client, address: &str, query: &QueryTimeRange) -> Stream<Transaction> {
+pub fn activity(
+    client: &Client,
+    address: &str,
+    query: &QueryTimeRange,
+) -> Stream<ProcessedTransaction> {
     client.fetch_stream(&format!("/accounts/{}/activity", address), query)
+}
+
+/// Fetches transactions related to the account. This does not include the
+/// transaction itself but transaction metadata and hash is provided.
+pub fn roles(client: &Client, address: &str) -> Stream<RoleTransaction> {
+    client.fetch_stream(&format!("/accounts/{}/roles", address), NO_QUERY)
 }
 
 #[cfg(test)]

@@ -74,6 +74,26 @@ pub use vars_v1::*;
 
 use serde::{Deserialize, Serialize};
 
+// the API provides transactions with extra metadata
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct ProcessedTransaction {
+    pub height: u64,
+    pub time: usize,
+    #[serde(flatten)]
+    pub txn: Transaction,
+}
+
+// the API provides transactions with extra metadata
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct RoleTransaction {
+    pub r#type: String,
+    pub time: usize,
+    pub height: usize,
+    pub hash: String,
+}
+
+// this is the base definition which is more or less
+// directly compatible with the protobuf definition
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(tag = "type", rename_all = "snake_case")]
 /// Represents one of various transactions in a block on the chain.
@@ -115,6 +135,48 @@ pub enum Transaction {
     #[serde(other)]
     Unknown, // Any other transaction not supported
 }
+
+impl Transaction {
+    pub fn hash(&self) -> &str {
+        match self {
+            Transaction::AddGatewayV1(txn) => &txn.hash,
+            Transaction::AssertLocationV1(txn) => &txn.hash,
+            Transaction::AssertLocationV2(txn) => &txn.hash,
+            Transaction::CoinbaseV1(txn) => &txn.hash,
+            Transaction::ConsensusGroupFailureV1(txn) => &txn.hash,
+            Transaction::ConsensusGroupV1(txn) => &txn.hash,
+            Transaction::CreateHtlcV1(txn) => &txn.hash,
+            Transaction::DcCoinbaseV1(txn) => &txn.hash,
+            Transaction::GenGatewayV1(txn) => &txn.hash,
+            Transaction::GenPriceOracleV1(txn) => &txn.hash,
+            Transaction::OuiV1(txn) => &txn.hash,
+            Transaction::PaymentV1(txn) => &txn.hash,
+            Transaction::PaymentV2(txn) => &txn.hash,
+            Transaction::PocReceiptsV1(txn) => &txn.hash,
+            Transaction::PocRequestV1(txn) => &txn.hash,
+            Transaction::PriceOracleV1(txn) => &txn.hash,
+            Transaction::RedeemHtlcV1(txn) => &txn.hash,
+            Transaction::RewardsV1(txn) => &txn.hash,
+            Transaction::RewardsV2(txn) => &txn.hash,
+            Transaction::RoutingV1(txn) => &txn.hash,
+            Transaction::SecurityCoinbaseV1(txn) => &txn.hash,
+            Transaction::SecurityExchangeV1(txn) => &txn.hash,
+            Transaction::StakeValidatorV1(txn) => &txn.hash,
+            Transaction::StateChannelCloseV1(txn) => &txn.hash,
+            Transaction::StateChannelOpenV1(txn) => &txn.hash,
+            Transaction::TokenBurnExchangeRateV1(txn) => &txn.hash,
+            Transaction::TokenBurnV1(txn) => &txn.hash,
+            Transaction::TransferHotspotV1(txn) => &txn.hash,
+            Transaction::TransferValidatorStakeV1(txn) => &txn.hash,
+            Transaction::UnstakeValidatorV1(txn) => &txn.hash,
+            Transaction::UpdateGatewayOuiV1(txn) => &txn.hash,
+            Transaction::ValidatorHeartbeatV1(txn) => &txn.hash,
+            Transaction::VarsV1(txn) => &txn.hash,
+            Transaction::Unknown => "unknown_txn",
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -127,7 +189,7 @@ mod test {
         let txn = transactions::get(&client, "1gidN7e6OKn405Fru_0sGhsqca3lTsrfGKrM4dwM_E8")
             .await
             .expect("PocRequestV1");
-        if let Transaction::PocRequestV1(poc) = txn {
+        if let Transaction::PocRequestV1(poc) = txn.txn {
             assert_eq!(
                 poc.block_hash,
                 "RS2mBvd_4pbKCglkkyMroDQekPNO0xDdYx6Te3HGDGg"
@@ -142,7 +204,7 @@ mod test {
         let txn = transactions::get(&client, "yh01SJk8dvyqb-BGXxkHFUuLi6wF1pfL0VEFStJUt-E")
             .await
             .expect("ConsensusGroupV1");
-        if let Transaction::ConsensusGroupV1(cg) = txn {
+        if let Transaction::ConsensusGroupV1(cg) = txn.txn {
             assert_eq!(cg.hash, "yh01SJk8dvyqb-BGXxkHFUuLi6wF1pfL0VEFStJUt-E")
         } else {
             assert!(false)
@@ -155,7 +217,7 @@ mod test {
         let txn = transactions::get(&client, "C_jJZLKBOv_gRQ6P6wEpZPiRVAjf44FOx1iHOFD4haA")
             .await
             .expect("PaymentV2");
-        if let Transaction::PaymentV2(p) = txn {
+        if let Transaction::PaymentV2(p) = txn.txn {
             assert_eq!(p.payments.len(), 1)
         } else {
             assert!(false)
@@ -167,7 +229,7 @@ mod test {
         let txn = transactions::get(&client, "8RaF-G4pvMVuIXfBYhdqNuIlFSEHPm_rC8TH-h4JYdE")
             .await
             .expect("PocReceipt");
-        if let Transaction::PocReceiptsV1(pr) = txn {
+        if let Transaction::PocReceiptsV1(pr) = txn.txn {
             assert_eq!(pr.hash, "8RaF-G4pvMVuIXfBYhdqNuIlFSEHPm_rC8TH-h4JYdE")
         } else {
             assert!(false)
@@ -193,7 +255,7 @@ mod test {
         let txn = transactions::get(&client, "iMSckt_hUcMFY_d7W-QOupY0MGq_g3-CC2dq3P-HWIw")
             .await
             .expect("PaymentV1");
-        if let Transaction::PaymentV1(p) = txn {
+        if let Transaction::PaymentV1(p) = txn.txn {
             assert_eq!(
                 p.payee,
                 "14YeKFGXE23yAdACj6hu5NWEcYzzKxptYbm5jHgzw9A1P1UQfMv"
@@ -208,7 +270,7 @@ mod test {
         let txn = transactions::get(&client, "X0HNRGZ1HAX51CR8qS6LTopAosjFkuaaKXl850IpNDE")
             .await
             .expect("RewardsV2");
-        if let Transaction::RewardsV2(r) = txn {
+        if let Transaction::RewardsV2(r) = txn.txn {
             assert_eq!(r.rewards.len(), 10138)
         } else {
             assert!(false)
@@ -220,7 +282,7 @@ mod test {
         let txn = transactions::get(&client, "_I16bycHeltuOo7eyqa4uhv2Bc7awcztZflyvRkVZ24")
             .await
             .expect("AssertLocationV1");
-        if let Transaction::AssertLocationV1(al) = txn {
+        if let Transaction::AssertLocationV1(al) = txn.txn {
             assert_eq!(al.hash, "_I16bycHeltuOo7eyqa4uhv2Bc7awcztZflyvRkVZ24")
         } else {
             assert!(false)
@@ -232,7 +294,7 @@ mod test {
         let txn = transactions::get(&client, "TfjRv733Q9FBQ1_unw1c9g5ewVmMBuyf7APuyxKEqrw")
             .await
             .expect("AssertLocationV2");
-        if let Transaction::AssertLocationV2(al) = txn {
+        if let Transaction::AssertLocationV2(al) = txn.txn {
             assert_eq!(
                 al.gateway,
                 "112WVxXCrCjiKmmDXLDUJuhYGEHMbXobUZe8oJQkHoMHEFa149a"
@@ -247,7 +309,7 @@ mod test {
         let txn = transactions::get(&client, "aoTggHSgaBAamuUUrXnY42jDZ5WUBxE0k-tshvfn35E")
             .await
             .expect("AddGatewayV1");
-        if let Transaction::AddGatewayV1(ag) = txn {
+        if let Transaction::AddGatewayV1(ag) = txn.txn {
             assert_eq!(
                 ag.gateway,
                 "112uuvztDziVQyLVvBxMsovsSPV5ZXkN6uQ5hrWSaWwV1oEZTZtd"
@@ -263,7 +325,7 @@ mod test {
         let txn = transactions::get(&client, "ia3c386ZnlVJorvo60WtXEFxy_0w35ImoIdmnW5lpJ8")
             .await
             .expect("AddGatewayV1");
-        if let Transaction::AddGatewayV1(ag) = txn {
+        if let Transaction::AddGatewayV1(ag) = txn.txn {
             assert_eq!(
                 ag.gateway,
                 "11GPcDmZGniewReZCnpC3SM19Jcw1sQU8W8CUnd7TCh4A6RmEkV"
@@ -279,7 +341,7 @@ mod test {
         let txn = transactions::get(&client, "vjtEQK0vn1w69fV3TMrlnN6L_qprsoWM_-7DVspmLL8")
             .await
             .expect("StateChannelCloseV1");
-        if let Transaction::StateChannelCloseV1(sc) = txn {
+        if let Transaction::StateChannelCloseV1(sc) = txn.txn {
             assert_eq!(
                 sc.closer,
                 "11QVeYckasapcrmqjZqtfGTjE154uHHUvYPPwW6EMwzrpsdr213"
@@ -295,7 +357,7 @@ mod test {
         let txn = transactions::get(&client, "fSFua7A8G41K05QXAvJi5N2OB0QqmQ7xp7u-My4rYHc")
             .await
             .expect("TransferHotspotV1");
-        if let Transaction::TransferHotspotV1(th) = txn {
+        if let Transaction::TransferHotspotV1(th) = txn.txn {
             assert_eq!(
                 th.seller,
                 "14mo9fFGKYFaWh7xscpDLg7misWcuU5xqR8mc8gHr4c43nDnzeX"
@@ -313,7 +375,7 @@ mod test {
             .await
             .expect("RoutingV1_NewXor");
 
-        if let Transaction::RoutingV1(r) = txn {
+        if let Transaction::RoutingV1(r) = txn.txn {
             assert_eq!(r.oui, 12);
             assert_eq!(
                 r.owner,
@@ -337,7 +399,7 @@ mod test {
             .await
             .expect("UnstakeValidatorv1");
 
-        if let Transaction::UnstakeValidatorV1(uv) = txn {
+        if let Transaction::UnstakeValidatorV1(uv) = txn.txn {
             assert_eq!(
                 uv.address,
                 "11cY9Ly5H3hU4Ai2k7G9niHLAxsKb1ragQYGLJ7E9vh4Vnx6Efb"
@@ -355,7 +417,7 @@ mod test {
         let txn = transactions::get(&client, "SB47bwBKP3ud1KdASYAndxkoIhZCXgPtusLUIsS7Q2o")
             .await
             .expect("VarsV1");
-        if let Transaction::VarsV1(v) = txn {
+        if let Transaction::VarsV1(v) = txn.txn {
             assert_eq!(
                 v.proof,
                 "MEUCIAXq0Pi0bK_DutFRF7R7ItEVrdUW2rmY8Guut5bHRboxAiEA9-wrvs7z9QZNRCC7XTKm4sb1cpXFD6TGB8Re8GfOyyA"
