@@ -115,6 +115,13 @@ pub enum Transaction {
     #[serde(other)]
     Unknown, // Any other transaction not supported
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum Challenge {
+    PocReceiptsV1(PocReceiptsV1),
+    PocReceiptsV2(PocReceiptsV2),
+}
 #[cfg(test)]
 mod test {
     use super::*;

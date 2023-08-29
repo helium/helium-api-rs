@@ -13,8 +13,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Account: {:?}", account);
 
     let params = QueryTimeRange {
-        min_time: "-30 day".into(),
-        max_time: "-1 hour".into(),
+        min_time: Some("-30 day".into()),
+        max_time: Some("-1 hour".into()),
     };
 
     let mut account_activity_stream = accounts::activity(

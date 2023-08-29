@@ -40,3 +40,88 @@ pub struct Account {
     #[serde(default)]
     pub speculative_sec_nonce: u64,
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Role {
+    #[serde(rename = "type")]
+    pub role_type: String,
+    pub time: u64,
+    pub role: String,
+    pub height: u64,
+    pub hash: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct RoleCount {
+    pub vars_v1: Option<u64>,
+    pub gen_validator_v1: Option<u64>,
+    pub price_oracle_v1: Option<u64>,
+    pub security_exchange_v1: Option<u64>,
+    pub gen_gateway_v1: Option<u64>,
+    pub consensus_group_v1: Option<u64>,
+    pub token_burn_exchange_rate_v1: Option<u64>,
+    pub transfer_hotspot_v2: Option<u64>,
+    pub poc_receipts_v1: Option<u64>,
+    pub validator_heartbeat_v1: Option<u64>,
+    pub create_htlc_v1: Option<u64>,
+    pub transfer_validator_stake_v1: Option<u64>,
+    pub stake_validator_v1: Option<u64>,
+    pub routing_v1: Option<u64>,
+    pub poc_request_v1: Option<u64>,
+    pub payment_v1: Option<u64>,
+    pub assert_location_v2: Option<u64>,
+    pub security_coinbase_v1: Option<u64>,
+    pub assert_location_v1: Option<u64>,
+    pub token_burn_v1: Option<u64>,
+    pub rewards_v1: Option<u64>,
+    pub unstake_validator_v1: Option<u64>,
+    pub oui_v1: Option<u64>,
+    pub state_channel_open_v1: Option<u64>,
+    pub rewards_v2: Option<u64>,
+    pub coinbase_v1: Option<u64>,
+    pub add_gateway_v1: Option<u64>,
+    pub poc_receipts_v2: Option<u64>,
+    pub consensus_group_failure_v1: Option<u64>,
+    pub payment_v2: Option<u64>,
+    pub transfer_hotspot_v1: Option<u64>,
+    pub dc_coinbase_v1: Option<u64>,
+    pub state_channel_close_v1: Option<u64>,
+    pub redeem_htlc_v1: Option<u64>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AccountReward {
+    pub r#type: Option<String>,
+    pub timestamp: String,
+    pub hash: String,
+    pub gateway: String,
+    pub block: u64,
+    pub amount: Hnt,
+    pub account: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AccountRewardsTotals {
+    pub total: f64,
+    pub sum: Hnt,
+    pub stddev: f64,
+    pub min: f64,
+    pub median: f64,
+    pub max: f64,
+    pub avg: f64,
+    pub timestamp: Option<String>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AccountStats {
+    pub last_day: Vec<StatsMeasures>,
+    pub last_month: Vec<StatsMeasures>,
+    pub last_week: Vec<StatsMeasures>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct StatsMeasures {
+    #[serde(deserialize_with = "Hnt::deserialize")]
+    pub balance: Hnt,
+    pub timestamp: String,
+}
