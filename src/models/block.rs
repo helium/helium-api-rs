@@ -7,6 +7,20 @@ pub struct Height {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct BlockStats {
+    pub last_day: BlockStatsMeasures,
+    pub last_hour: BlockStatsMeasures,
+    pub last_month: BlockStatsMeasures,
+    pub last_week: BlockStatsMeasures,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BlockStatsMeasures {
+    pub avg: f64,
+    pub stddev: f64,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Descriptions {
     pub data: Vec<BlockData>,
     pub cursor: Option<String>,

@@ -1,5 +1,5 @@
 use crate::{
-    models::{transactions::Transaction, Descriptions, Height},
+    models::{transactions::Transaction, BlockData, BlockStats, Descriptions, Height},
     *,
 };
 
@@ -7,6 +7,11 @@ use crate::{
 pub async fn height(client: &Client) -> Result<u64> {
     let height: Height = client.fetch("/blocks/height", NO_QUERY).await?;
     Ok(height.height)
+}
+
+pub async fn stats(client: &Client) -> Result<BlockStats> {
+    let stats = client.fetch("/blocks/stats", NO_QUERY).await?;
+    Ok(stats)
 }
 
 /// Retrieves block descriptions. Blocks descriptions are paged.
@@ -17,6 +22,20 @@ pub async fn descriptions(client: &Client, cursor: Option<&str>) -> Result<Descr
         .fetch_data("/blocks", &query)
         .await
         .map(|Data { data, cursor }| Descriptions { data, cursor })
+}
+
+pub async fn block_at_height(client: &Client, height: u64) -> Result<BlockData> {
+    let block: BlockData = client
+        .fetch(&format!("/blocks/{}", height), NO_QUERY)
+        .await?;
+    Ok(block)
+}
+
+pub async fn block_at_hash(client: &Client, hash: &str) -> Result<BlockData> {
+    let block: BlockData = client
+        .fetch(&format!("/blocks/hash/{}", hash), NO_QUERY)
+        .await?;
+    Ok(block)
 }
 
 pub fn transactions_at_height(client: &Client, block: u64) -> Stream<Transaction> {
@@ -43,12 +62,54 @@ mod test {
     }
 
     #[test]
+    async fn stats() {
+        let client = get_test_client();
+        let stats = blocks::stats(&client).await.expect("stats");
+        assert!(stats.last_hour.avg > 0.0);
+        assert!(stats.last_hour.stddev > 0.0);
+        assert!(stats.last_day.avg > 0.0);
+        assert!(stats.last_day.stddev > 0.0);
+        assert!(stats.last_week.avg > 0.0);
+        assert!(stats.last_week.stddev > 0.0);
+        assert!(stats.last_month.avg > 0.0);
+        assert!(stats.last_month.stddev > 0.0);
+    }
+
+    #[test]
     async fn descriptions() {
         let client = get_test_client();
         let descriptions = blocks::descriptions(&client, None)
             .await
             .expect("descriptions");
         assert!(descriptions.data.len() > 0);
+    }
+
+    #[test]
+    async fn block_at_height() {
+        let client = get_test_client();
+        let block = blocks::block_at_height(&client, 1379987)
+            .await
+            .expect("block_at_height");
+        assert!(block.height == 1379987);
+        assert!(block.hash == "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8");
+        assert!(block.prev_hash == "3E6pPSnAVNlJMKz-CWtnBpwilLaM3TypxSYAgtaRweo");
+        assert!(block.transaction_count == 194);
+        assert!(block.time == 1654199928);
+        assert!(block.snapshot_hash == "");
+    }
+
+    #[test]
+    async fn block_at_hash() {
+        let client = get_test_client();
+        let block = blocks::block_at_hash(&client, "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8")
+            .await
+            .expect("block_at_hash");
+        assert!(block.height == 1379987);
+        assert!(block.hash == "6amxWy5inERGrpr3lIG9E-2ZkhOJX60bQafY5NctNv8");
+        assert!(block.prev_hash == "3E6pPSnAVNlJMKz-CWtnBpwilLaM3TypxSYAgtaRweo");
+        assert!(block.transaction_count == 194);
+        assert!(block.time == 1654199928);
+        assert!(block.snapshot_hash == "");
     }
 
     #[test]
