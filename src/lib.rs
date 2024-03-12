@@ -22,6 +22,7 @@ pub mod models;
 pub mod oracle;
 pub mod ouis;
 pub mod pending_transactions;
+pub mod stats;
 pub mod transactions;
 pub mod validators;
 pub mod vars;
